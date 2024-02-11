@@ -31,6 +31,16 @@ void Output::modPixel(double red, double green, double blue, int posX, int posY)
     // generateImage(); 
 }
 
+std::vector<double> Output::getPixel(int posX, int posY){
+    std::vector<double> output;
+    output.push_back(imageArr[posY*width+posX][0]);
+    output.push_back(imageArr[posY*width+posX][1]);
+    output.push_back(imageArr[posY*width+posX][2]);
+
+    return output;
+    // generateImage(); 
+}
+
 void Output::generateImage(){
     std::fstream image;
     int linePos = 0;
