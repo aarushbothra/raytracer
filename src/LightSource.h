@@ -9,7 +9,7 @@ class LightSource{
         LightSource(Ray position_, bool directional_, double intensity_){
             position = position_;
             directional = directional_;
-            intensity = intensity;
+            intensity = intensity_;
         }
         Ray getPosition(){
             return position;
@@ -20,4 +20,5 @@ class LightSource{
         double intensitity(){
             return intensity;
         }
+        void print(std::string message);
 };

@@ -4,10 +4,9 @@ OUTFILE=raytracer1b
 .DEFAULT_GOAL := all
 all: $(OUTFILE)
 
-$(OUTFILE): main.o Input.o Output.o RayCast.o Ray.o Sphere.o
+$(OUTFILE): main.o Input.o Output.o RayCast.o Ray.o Sphere.o LightSource.o
 	make deletePrevious
-	$(CXX) $(CXXFLAGS) main.o Input.o Output.o RayCast.o Ray.o Sphere.o -o $(OUTFILE) 
-	make postClean
+	$(CXX) $(CXXFLAGS) main.o Input.o Output.o RayCast.o Ray.o Sphere.o LightSource.o -o $(OUTFILE) 
 
 main.o: src/main.cpp
 	$(CXX) $(CXXFLAGS) -c src/main.cpp -o main.o 

@@ -8,7 +8,7 @@ Input::Input(std::string filename){
     std::string input;
     inputFile.open(filename);
     int inputCounter = 0;
-    while (!inputFile.eof()){
+    while (!inputFile.eof() && inputFile.is_open()){
         inputFile >> input;
         // std::cout << "input: " << input << std::endl;
         if (input == "imsize"){
@@ -51,45 +51,27 @@ Input::Input(std::string filename){
         else if (input == "mtlcolor"){
             std::vector<double> materialColor;
             std::vector<double> sphereLocationAndRadius;       
-            // double doubleInput;
-            // for (int i=0; i<3;i++){
-            //     inputFile >> doubleInput;
-            //     std::cout << "   " << doubleInput;
-            //     materialColor.push_back(doubleInput);
-            // }
-            // std::cout << std::endl;
-
-            // fileCurrPos = inputFile.tellg();
-            // inputFile.close();
             materialColor = getInputs();
-            // std::cout << "sphere found " << std::endl;
-            // inputFile.open(filename);
-            // inputFile.seekg(fileCurrPos);
             inputFile >> input;
-            // fileCurrPos = inputFile.tellg();
-            // inputFile.close();
-            // for (int i=0; i<4;i++){
-            //     inputFile >> doubleInput;
-            //     std::cout << "   " << doubleInput;
-            //     sphereLocationAndRadius.push_back(doubleInput);
-            // }
-            // std::cout << std::endl;
             if (input == "sphere"){
                 sphereLocationAndRadius = getInputs();
                 Ray sphereLocation(sphereLocationAndRadius[0],sphereLocationAndRadius[1],sphereLocationAndRadius[2]);
                 spheres.push_back(Sphere(sphereLocation,materialColor,sphereLocationAndRadius.at(3)));
             }
-            // inputFile >> input;
-            // inputFile >> input;
-            // std::cout << "input: " << input << std::endl;
+        } else if (input == "light"){
+            std::vector<double> lightInput = getInputs();
+            Ray position(lightInput[0],lightInput[1],lightInput[2]);
+            LightSource newLight(position, lightInput[3], lightInput[4]);
+            lights.push_back(newLight);
         }
+        std::cout << input << "\n";
         
     }
+
     inputFile.close();
-    if (inputCounter == 6 && spheres.size() > 0){
+    if (inputCounter == 6 && spheres.size() > 0 && lights.size() > 0){
         isComplete = true;
     }
-
 }
 
 std::string Input::getFilename(){
@@ -142,6 +124,9 @@ void Input::printInput(){
         printVector(spheres.at(i).getMaterial());
         spheres.at(i).getLocation().print("sphere ");
     }
+    for (int i=0;i<lights.size();i++){
+        lights.at(i).print("light ");
+    }
     
 }
 
@@ -150,7 +135,7 @@ std::vector<double> Input::getInputs(){
     std::vector<double> output;
     double input;
 
-    while (inputFile.peek() != '\n'){
+    while (inputFile.peek() != '\n' && !inputFile.eof()){
         inputFile >> input;
         // std::cout << "   " << input;
         output.push_back(input);
