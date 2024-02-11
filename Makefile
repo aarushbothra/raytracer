@@ -27,9 +27,8 @@ RayCast.o: src/RayCast.cpp src/RayCast.h
 Sphere.o: src/Sphere.h src/Sphere.cpp
 	$(CXX) $(CXXFLAGS) -c src/Sphere.cpp -o Sphere.o 
 
-
-
-	
+LightSource.o: src/LightSource.h src/LightSource.cpp
+	$(CXX) $(CXXFLAGS) -c src/LightSource.cpp -o LightSource.o 
 
 .PHONY: all clean
 
