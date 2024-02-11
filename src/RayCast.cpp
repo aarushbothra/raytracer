@@ -124,17 +124,12 @@ std::vector<double> RayCast::checkSpheres(Ray input){
     }
 
     if (least >= 0){
-        
         pixelColor = spheres.at(leastIndex).getMaterial();
-        if (input == testRay){
-            std::cout << "found sphere" << std::endl;
-            printVector(pixelColor, "pixelColor: ");
+        if (pixelColor.size() > 3){
+            //calc phong illumination
+            std::cout << "phong" << std::endl;
         }
     }
-
-    
-       
-    
     
     return pixelColor;
 }

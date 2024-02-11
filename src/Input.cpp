@@ -13,18 +13,18 @@ Input::Input(std::string filename){
         // std::cout << "input: " << input << std::endl;
         if (input == "imsize"){
             
-            imageSize = Input::getInputs(2);
+            imageSize = Input::getInputs();
             inputCounter++;
         }
         else if (input == "eye"){
             
-            viewOrigin = Input::getInputs(3);
+            viewOrigin = Input::getInputs();
             inputCounter++;
 
         }
         else if (input == "viewdir"){
             
-            viewDir = Input::getInputs(3);
+            viewDir = Input::getInputs();
             inputCounter++;
 
         }
@@ -36,7 +36,7 @@ Input::Input(std::string filename){
         }
         else if (input == "updir"){
             
-            upDir = Input::getInputs(3);
+            upDir = Input::getInputs();
             inputCounter++;
 
         }
@@ -44,7 +44,7 @@ Input::Input(std::string filename){
         else if (input == "bkgcolor"){
             // std::cout << "bkgcolor: " << std::endl;
             
-            backgroundColor = Input::getInputs(3);
+            backgroundColor = Input::getInputs();
             inputCounter++;
 
         }
@@ -61,7 +61,7 @@ Input::Input(std::string filename){
 
             // fileCurrPos = inputFile.tellg();
             // inputFile.close();
-            materialColor = getInputs(3);
+            materialColor = getInputs();
             // std::cout << "sphere found " << std::endl;
             // inputFile.open(filename);
             // inputFile.seekg(fileCurrPos);
@@ -75,7 +75,7 @@ Input::Input(std::string filename){
             // }
             // std::cout << std::endl;
             if (input == "sphere"){
-                sphereLocationAndRadius = getInputs(4);
+                sphereLocationAndRadius = getInputs();
                 Ray sphereLocation(sphereLocationAndRadius[0],sphereLocationAndRadius[1],sphereLocationAndRadius[2]);
                 spheres.push_back(Sphere(sphereLocation,materialColor,sphereLocationAndRadius.at(3)));
             }
@@ -145,12 +145,12 @@ void Input::printInput(){
     
 }
 
-std::vector<double> Input::getInputs(int numInputs){
+std::vector<double> Input::getInputs(){
     
     std::vector<double> output;
     double input;
 
-    for (int i=0; i<numInputs;i++){
+    while (inputFile.peek() != '\n'){
         inputFile >> input;
         // std::cout << "   " << input;
         output.push_back(input);

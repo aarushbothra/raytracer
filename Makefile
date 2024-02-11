@@ -1,12 +1,12 @@
 CXX=g++
 CXXFLAGS= -std=c++11 -g
-
+OUTFILE=raytracer1b
 .DEFAULT_GOAL := all
-all: raytracer1a
+all: $(OUTFILE)
 
-raytracer1a: main.o Input.o Output.o RayCast.o Ray.o Sphere.o
+$(OUTFILE): main.o Input.o Output.o RayCast.o Ray.o Sphere.o
 	make deletePrevious
-	$(CXX) $(CXXFLAGS) main.o Input.o Output.o RayCast.o Ray.o Sphere.o -o raytracer1a 
+	$(CXX) $(CXXFLAGS) main.o Input.o Output.o RayCast.o Ray.o Sphere.o -o $(OUTFILE) 
 	make postClean
 
 main.o: src/main.cpp
@@ -34,10 +34,10 @@ Sphere.o: src/Sphere.h src/Sphere.cpp
 .PHONY: all clean
 
 deletePrevious:
-	rm -f raytracer1a
+	rm -f $(OUTFILE)
 
 postClean:
 	rm -f *.o
 
 clean:
-	rm -f *.o raytracer1a *.ppm
+	rm -f *.o $(OUTFILE) *.ppm
