@@ -25,6 +25,8 @@ int main(int argc, char *argv[]){
 
     Output image(userInput);
     RayCast rayCaster(userInput, image);
+
+    image.generateImage();
     
     return 0;
 }

@@ -16,7 +16,6 @@ class RayCast{
         Ray v;
         Ray normalizeRay(Ray input);
         void printVector(std::vector<double> input, std::string message);
-        void calcImage(Output image);//calculates color values for each pixel of image
         std::vector<double> checkSpheres(Ray ray);//checks if specific pixel should be the color of the sphere material. returns the color of the pixel based on those calculations
         Ray crossProduct(Ray a, Ray b);
         double viewWindowWidth;

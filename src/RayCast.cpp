@@ -5,8 +5,10 @@ RayCast::RayCast(Input userInput, Output image){
     inputFromUser = &userInput;
     userImage = &image;
     std::cout << "calc image" << std::endl;
-    calcImage(image);
-
+    calcViewingWindow();
+    calcCorners();
+    calcViewRays();
+    
 }
 
 
@@ -20,14 +22,11 @@ void RayCast::calcViewingWindow(){
     v.print("v: ");
 
     viewWindowWidth = 2*viewingDistance*tan(degreesToRadians(0.5*inputFromUser->getHFOV()));
-    std::cout << "view window width: " << viewWindowWidth << std::endl;
+    // std::cout << "view window width: " << viewWindowWidth << std::endl;
     aspectRatio = inputFromUser->getImageSize()[0]/inputFromUser->getImageSize()[1];
-    std::cout << "aspectRatio: " << aspectRatio << std::endl;
+    // std::cout << "aspectRatio: " << aspectRatio << std::endl;
     viewWindowHeight = viewWindowWidth*(1/aspectRatio);
-    // double vFOV = radiansToDegrees(2*atan((0.5*tan(degreesToRadians(0.5*inputFromUser->getHFOV())))));
-    // std::cout << "vFOV: " << vFOV << std::endl;
-    // viewWindowHeight = 2*viewingDistance*tan(degreesToRadians(0.5*vFOV));
-    std::cout << "view window height: " << viewWindowHeight << std::endl;
+    // std::cout << "view window height: " << viewWindowHeight << std::endl;
 }
 
 void RayCast::calcCorners(){
@@ -35,58 +34,27 @@ void RayCast::calcCorners(){
     Ray viewDir(inputFromUser->getViewDir());
     viewDir = normalizeRay(viewDir);
     ll = viewOrigin + (viewDir*viewingDistance) - (u*(viewWindowWidth/2)) - (v*(viewWindowHeight/2));
-    ll.print("ll: ");
+    // ll.print("ll: ");
     ul = viewOrigin + (viewDir*viewingDistance) - (u*(viewWindowWidth/2)) + (v*(viewWindowHeight/2));
-    ul.print("ul: ");
+    // ul.print("ul: ");
     lr = viewOrigin + (viewDir*viewingDistance) + (u*(viewWindowWidth/2)) - (v*(viewWindowHeight/2));
-    lr.print("lr: ");
+    // lr.print("lr: ");
     ur = viewOrigin + (viewDir*viewingDistance) + (u*(viewWindowWidth/2)) + (v*(viewWindowHeight/2));
-    ur.print("ur: ");
+    // ur.print("ur: ");
 }
 
-void RayCast::calcImage(Output image){
-    calcViewingWindow();
-    calcCorners();
-    calcViewRays();
-    // int width = inputFromUser->getImageSize()[0];
-    
-    // int height = inputFromUser->getImageSize()[1];
-    // for(int j=0;j<height;j++){
-    //     for (int i=0;i<width;i++){
-    //         // std::cout << "i: " << i << " j: " << j << std::endl;
-    //         // rays.at(j).at(i).print("ray: ");
-    //         std::vector<double> pixelColor = checkSpheres(rays.at(j).at(i));
-    //         // if (i == 1 && j == 1){
-    //         //     std::cout << (rays.at(j).at(i) == testRay) << std::endl;
-    //         // }
-    //         image.modPixel(pixelColor[0],pixelColor[1],pixelColor[2],i,j);
-    //     }
-    // }
-
-    image.generateImage();
-}
 
 void RayCast::calcViewRays(){
     double width = inputFromUser->getImageSize()[0];
     double height = inputFromUser->getImageSize()[1];
     Ray deltaH =(ur-ul)*(1/(width-1));
-    deltaH.print("deltaH: ");
+    // deltaH.print("deltaH: ");
     Ray deltaV =(ll-(ul)) * (1/(height-1));
-    deltaV.print("deltaV: ");
-    std::cout << "calculating rays" << std::endl;
+    // deltaV.print("deltaV: ");
+    // std::cout << "calculating rays" << std::endl;
     for(int j=0;j<height;j++){
         for (int i=0;i<width;i++){
             
-            if (i == 50&& j == 239){
-                (deltaV*(j)).print("deltaV*j: ");
-                std::cout << "i: " << i << " j: " << j << std::endl;
-                testRay = normalizeRay(ul + (deltaV*(j)) + (deltaH*(i)));
-                testRay.print("testRay: ");
-                Ray temporary = ul + (deltaV*(j)) + (deltaH*(i));
-                temporary.print("testRay unnormalized: ");
-                temporary.square();
-                std::cout << "testRay magnitude: " << sqrt(temporary.sum()) << std::endl;
-            }
             std::vector<double> pixelColor = checkSpheres(normalizeRay(ul + (deltaV*(j)) + (deltaH*(i))));
             userImage->modPixel(pixelColor[0],pixelColor[1],pixelColor[2],i,j);
 
@@ -108,29 +76,27 @@ std::vector<double> RayCast::checkSpheres(Ray input){
         aTemp.square();
 
         double A = aTemp.sum();
-
         double B = (input*(viewOrigin+(spheres.at(i).getLocation()*-1))).sum()*2;
         // std::cout << "B: " << B << std::endl;
         // viewOrigin.print("viewOrigin: ");
         // spheres.at(i).getLocation().print("sphere Location: ");
 
         Ray cTemp = (viewOrigin+(spheres.at(i).getLocation()*-1));
-        // cTemp.print("ctemp: ");
         cTemp.square();
         double C =  cTemp.sum() - pow(spheres.at(i).getRadius(),2);
         double minus = (-B-sqrt((B*B)-(4*C*A)))/(2*A);
         double plus = (-B+sqrt((B*B)-(4*C*A)))/(2*A);
 
-        if (input == testRay){
-            std::cout<<"A: " << A << std::endl;
-            std::cout << "B: " << B << std::endl;
-            viewOrigin.print("viewOrigin: ");
-            spheres.at(i).getLocation().print("sphere Location: ");
-            std::cout << "C: " << C << std::endl;
-            std::cout << "minus: " << minus << std::endl;
-            std::cout << "plus: " << plus << std::endl;
-            std::cout << "determinant: " <<  (B*B)-(4*C) << std::endl;
-        }
+        // if (input == testRay){
+        //     std::cout<<"A: " << A << std::endl;
+        //     std::cout << "B: " << B << std::endl;
+        //     viewOrigin.print("viewOrigin: ");
+        //     spheres.at(i).getLocation().print("sphere Location: ");
+        //     std::cout << "C: " << C << std::endl;
+        //     std::cout << "minus: " << minus << std::endl;
+        //     std::cout << "plus: " << plus << std::endl;
+        //     std::cout << "determinant: " <<  (B*B)-(4*C) << std::endl;
+        // }
 
         if(plus >= 0 && minus >= 0){
             if (plus >= minus){
@@ -145,9 +111,6 @@ std::vector<double> RayCast::checkSpheres(Ray input){
         } else {
             distance.push_back(-1);
         }
-    }
-    if (input == testRay){
-        printVector(distance, "distance: ");
     }
     double least = -1;
     int leastIndex;
