@@ -17,7 +17,7 @@ class LightSource{
         bool getDirectionality(){
             return directional;
         }
-        double intensitity(){
+        double getIntensity(){
             return intensity;
         }
         void print(std::string message);

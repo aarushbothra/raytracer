@@ -127,11 +127,16 @@ std::vector<double> RayCast::checkSpheres(Ray input){
         pixelColor = spheres.at(leastIndex).getMaterial();
         if (pixelColor.size() > 3){
             //calc phong illumination
-            std::cout << "phong" << std::endl;
+            pixelColor = shadeRay(input, spheres.at(leastIndex));
         }
     }
     
     return pixelColor;
+}
+
+std::vector<double> RayCast::shadeRay(Ray input, Sphere sphereAtRay){
+    std::vector<double> output(3);
+    return output;
 }
 
 Ray RayCast::normalizeRay(Ray input){
