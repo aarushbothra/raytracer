@@ -71,6 +71,7 @@ Input::Input(std::string filename){
                 break;
             }
 
+            inputFile.clear();
             inputFile.seekg(holdPosition);
 
         } else if (input == "light"){
@@ -86,7 +87,7 @@ Input::Input(std::string filename){
     inputFile.close();
     if (inputCounter == 6 && spheres.size() > 0 && lights.size() > 0){
         isComplete = true;
-    }
+    } 
 }
 
 std::string Input::getFilename(){
@@ -148,12 +149,26 @@ void Input::printInput(){
 std::vector<double> Input::getInputs(){
     
     std::vector<double> output;
-    double input;
-
+    std::string input;
     while (inputFile.peek() != '\n' && !inputFile.eof()){
+        int holdPosition = inputFile.tellg();
         inputFile >> input;
         // std::cout << "   " << input;
-        output.push_back(input);
+        double doubleInput;
+        
+        try {
+            doubleInput = stod(input);
+            
+        } catch (const std::invalid_argument&) {
+            std::cout << "not a double\n";
+            inputFile.seekg(holdPosition);
+            break;
+        } catch (const std::out_of_range&) {
+            std::cout << "value out of range\n";
+            inputFile.seekg(holdPosition);
+            break;
+        }
+        output.push_back(doubleInput);
     }
     // std::cout << std::endl;
     
