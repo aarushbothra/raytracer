@@ -11,15 +11,14 @@ RayCast::RayCast(Input userInput, Output image){
     
 }
 
-
 void RayCast::calcViewingWindow(){
     w = normalizeRay(inputFromUser->getViewDir())*-1;
-    w.print("w: ");
+    // w.print("w: ");
     printVector(inputFromUser->getUpDir(), "upDir: ");
     u = normalizeRay(crossProduct(inputFromUser->getViewDir(), inputFromUser->getUpDir()));
-    u.print("u: ");
+    // u.print("u: ");
     v = normalizeRay(crossProduct(u, inputFromUser->getViewDir()));
-    v.print("v: ");
+    // v.print("v: ");
 
     viewWindowWidth = 2*viewingDistance*tan(degreesToRadians(0.5*inputFromUser->getHFOV()));
     // std::cout << "view window width: " << viewWindowWidth << std::endl;
@@ -42,7 +41,6 @@ void RayCast::calcCorners(){
     ur = viewOrigin + (viewDir*viewingDistance) + (u*(viewWindowWidth/2)) + (v*(viewWindowHeight/2));
     // ur.print("ur: ");
 }
-
 
 void RayCast::calcViewRays(){
     double width = inputFromUser->getImageSize()[0];
@@ -67,18 +65,19 @@ std::vector<double> RayCast::checkSpheres(Ray input, Ray viewOrigin){
     std::vector<double> pixelColor = inputFromUser->getBackgroundColor();
     std::vector<Sphere> spheres = inputFromUser->getSpheres();
     std::vector<double> distance;
-    // std::cout << "spheres size: " << spheres.size() << std::endl;
-    // std::cout << "checking sphere" << std::endl;
+    double error = 1.0e-10;
     for (int i=0;i<spheres.size();i++){
-        // input.print("input: ");
+        //check if viewOrigin is on current sphere. if so, skip calculations
+        if ((pow((viewOrigin[0]-spheres[i].getLocation()[0]),2) + pow((viewOrigin[1]-spheres[i].getLocation()[1]),2) + pow((viewOrigin[2]-spheres[i].getLocation()[2]),2)) == pow(spheres[i].getRadius(),2)){
+            distance.push_back(-1);
+            continue;
+        }
+
         Ray aTemp = input;
         aTemp.square();
 
         double A = aTemp.sum();
         double B = (input*(viewOrigin+(spheres.at(i).getLocation()*-1))).sum()*2;
-        // std::cout << "B: " << B << std::endl;
-        // viewOrigin.print("viewOrigin: ");
-        // spheres.at(i).getLocation().print("sphere Location: ");
 
         Ray cTemp = (viewOrigin+(spheres.at(i).getLocation()*-1));
         cTemp.square();
@@ -86,26 +85,15 @@ std::vector<double> RayCast::checkSpheres(Ray input, Ray viewOrigin){
         double minus = (-B-sqrt((B*B)-(4*C*A)))/(2*A);
         double plus = (-B+sqrt((B*B)-(4*C*A)))/(2*A);
 
-        // if (input == testRay){
-        //     std::cout<<"A: " << A << std::endl;
-        //     std::cout << "B: " << B << std::endl;
-        //     viewOrigin.print("viewOrigin: ");
-        //     spheres.at(i).getLocation().print("sphere Location: ");
-        //     std::cout << "C: " << C << std::endl;
-        //     std::cout << "minus: " << minus << std::endl;
-        //     std::cout << "plus: " << plus << std::endl;
-        //     std::cout << "determinant: " <<  (B*B)-(4*C) << std::endl;
-        // }
-
-        if(plus >= 0 && minus >= 0){
+        if(plus >= error && minus >= error){
             if (plus >= minus){
                 distance.push_back(minus);
             } else {
                 distance.push_back(plus);
             }
-        } else if (plus >= 0){
+        } else if (plus >= error){
             distance.push_back(plus);
-        } else if (minus >= 0){
+        } else if (minus >= error){
             distance.push_back(minus);
         } else {
             distance.push_back(-1);
@@ -132,8 +120,7 @@ std::vector<double> RayCast::checkSpheres(Ray input, Ray viewOrigin){
             }
         }
     } else {
-        if (least>1.0e-10){
-            
+        if (least!=-1){
             pixelColor = {2};
         }
     }
@@ -143,13 +130,10 @@ std::vector<double> RayCast::checkSpheres(Ray input, Ray viewOrigin){
 
 std::vector<double> RayCast::shadeRay(Sphere sphereAtRay, Ray intersectPos){
     std::vector<double> output(3);
-    // std::vector<Ray> nVec;
-    // std::vector<Ray> lVec;
     Ray colorSum;
     std::vector<LightSource> lights = inputFromUser->getLights();
 
     for (auto light:lights){
-        Ray nVec = (normalizeRay((intersectPos-sphereAtRay.getLocation())*(1/sphereAtRay.getRadius())));
         Ray lVec;
         if(light.isDirectional()){
             lVec = (normalizeRay(light.getPosition()*-1));
@@ -157,17 +141,16 @@ std::vector<double> RayCast::shadeRay(Sphere sphereAtRay, Ray intersectPos){
             lVec = (normalizeRay(light.getPosition()-intersectPos));
         }
 
+        std::vector<double> trueVector = {2};
+        if (checkSpheres(lVec, intersectPos) == trueVector){
+            continue;
+        } 
+
+        Ray nVec = (normalizeRay((intersectPos-sphereAtRay.getLocation())*(1/sphereAtRay.getRadius())));
         Ray vVec = normalizeRay(inputFromUser->getViewOrigin()-intersectPos);
         Ray hVec = normalizeRay((lVec+vVec));
         
-        
-        // std:: cout << "N dot L" << dotProduct(nVec,lVec) << std::endl;
-        std::vector<double> trueVector = {2};
-        if (checkSpheres(lVec, intersectPos) != trueVector){
-            colorSum = colorSum + (((sphereAtRay.KdOdLam*min(0,dotProduct(nVec,lVec))) + (sphereAtRay.KsOsLam*pow(min(0,dotProduct(nVec,hVec)),sphereAtRay.n)))*light.getIntensity());
-        } else {
-            // std::cout << "sphere intersect\n";
-        }
+        colorSum = colorSum + (((sphereAtRay.KdOdLam*min(0,dotProduct(nVec,lVec))) + (sphereAtRay.KsOsLam*pow(min(0,dotProduct(nVec,hVec)),sphereAtRay.n)))*light.getIntensity());
     }
 
     colorSum = colorSum + sphereAtRay.KaOdLam;
