@@ -8,13 +8,13 @@ class LightSource{
     public:
         LightSource(Ray position_, bool directional_, double intensity_){
             position = position_;
-            directional = directional_;
+            directional = !directional_;
             intensity = intensity_;
         }
         Ray getPosition(){
             return position;
         }
-        bool getDirectionality(){
+        bool isDirectional(){
             return directional;
         }
         double getIntensity(){
