@@ -82,7 +82,7 @@ Input::Input(std::string filename){
                 lights.push_back(newLight);
             }
         }
-        std::cout << input << "\n";
+        // std::cout << input << "\n";
         
     }
 
