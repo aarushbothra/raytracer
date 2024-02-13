@@ -16,7 +16,7 @@ class RayCast{
         Ray v;
         Ray normalizeRay(Ray input);
         void printVector(std::vector<double> input, std::string message);
-        std::vector<double> checkSpheres(Ray ray, Ray viewOrigin);//checks if specific pixel should be the color of the sphere material. returns the color of the pixel based on those calculations
+        std::vector<double> checkSpheres(Ray ray, Ray viewOrigin);//checks if ray intersects with sphere
         Ray crossProduct(Ray a, Ray b);
         double viewWindowWidth;
         double viewWindowHeight;
@@ -34,8 +34,8 @@ class RayCast{
         void calcViewingWindow();//calculate vectors that define viewing window, as well as its size
         Ray testRay; 
         Output* userImage;
-        std::vector<double> shadeRay(Sphere sphereAtRay, Ray intersectPos);
+        std::vector<double> shadeRay(Sphere sphereAtRay, Ray intersectPos);//calculates shadows from direct light interaction as well as objects
         double dotProduct(Ray a, Ray b);
-        double min(double minimum, double input);
+        double min(double minimum, double input);//checks if input is below minumum. if true, return minimum, otherwise return input
 };
 
