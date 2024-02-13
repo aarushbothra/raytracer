@@ -122,20 +122,47 @@ std::vector<double> RayCast::checkSpheres(Ray input){
             }
         }
     }
-
+    
     if (least >= 0){
         pixelColor = spheres.at(leastIndex).getMaterial();
         if (pixelColor.size() > 3){
             //calc phong illumination
-            pixelColor = shadeRay(input, spheres.at(leastIndex));
+            Ray intersectPos = viewOrigin+(input*distance[leastIndex]);
+            pixelColor = shadeRay(input, spheres.at(leastIndex), intersectPos);
         }
     }
     
     return pixelColor;
 }
 
-std::vector<double> RayCast::shadeRay(Ray input, Sphere sphereAtRay){
+std::vector<double> RayCast::shadeRay(Ray input, Sphere sphereAtRay, Ray intersectPos){
     std::vector<double> output(3);
+    // std::vector<Ray> nVec;
+    // std::vector<Ray> lVec;
+    Ray colorSum;
+    std::vector<LightSource> lights = inputFromUser->getLights();
+
+    for (auto light:lights){
+        Ray nVec = (normalizeRay((intersectPos-sphereAtRay.getLocation())*(1/sphereAtRay.getRadius())));
+        Ray lVec;
+        if(light.isDirectional()){
+            lVec = (normalizeRay(light.getPosition()*-1));
+        } else {
+            lVec = (normalizeRay(light.getPosition()-intersectPos));
+        }
+
+        Ray vVec = normalizeRay(inputFromUser->getViewOrigin()-intersectPos);
+        Ray hVec = normalizeRay((lVec+vVec));
+        
+        colorSum = colorSum + (((sphereAtRay.KdOdLam*min(0,dotProduct(nVec,lVec))) + (sphereAtRay.KsOsLam*pow(min(0,dotProduct(nVec,hVec)),sphereAtRay.n)))*light.getIntensity());
+        // std:: cout << "N dot L" << dotProduct(nVec,lVec) << std::endl;
+    }
+
+    colorSum = colorSum + sphereAtRay.KaOdLam;
+    output[0] = colorSum[0];
+    output[1] = colorSum[1];
+    output[2] = colorSum[2];
+
     return output;
 }
 
@@ -163,7 +190,6 @@ Ray RayCast::crossProduct(Ray a, Ray b){
     return Ray(output);
 }
 
-
 void RayCast::printVector(std::vector<double> input, std::string message){
     std::cout << message;
     for (int i=0;i<input.size();i++){
@@ -180,4 +206,18 @@ double RayCast::radiansToDegrees(double radians){
     return radians*(180/M_PI);
 }
 
+double RayCast::dotProduct(Ray a, Ray b){
+    double sum = 0;
+    for (int i=0;i<3;i++){
+        sum += a[i]*b[i];
+    }
+    return sum;
+}
 
+double RayCast::min(double minimum, double input){
+    if (input < minimum){
+        return minimum;
+    } else {
+        return input;
+    }
+}

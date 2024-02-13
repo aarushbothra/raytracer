@@ -34,6 +34,8 @@ class RayCast{
         void calcViewingWindow();//calculate vectors that define viewing window, as well as its size
         Ray testRay; 
         Output* userImage;
-        std::vector<double> shadeRay(Ray input, Sphere sphereAtRay);
+        std::vector<double> shadeRay(Ray input, Sphere sphereAtRay, Ray intersectPos);
+        double dotProduct(Ray a, Ray b);
+        double min(double minimum, double input);
 };
 
