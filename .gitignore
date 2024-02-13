@@ -1,4 +1,5 @@
-raytracer1a
+raytracer*
 *.pdf
 *.ppm
 *.txt
+*.o
