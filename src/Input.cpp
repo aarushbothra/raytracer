@@ -52,12 +52,27 @@ Input::Input(std::string filename){
             std::vector<double> materialColor;
             std::vector<double> sphereLocationAndRadius;       
             materialColor = getInputs();
+            int holdPosition = inputFile.tellg();
             inputFile >> input;
-            if (input == "sphere"){
-                sphereLocationAndRadius = getInputs();
-                Ray sphereLocation(sphereLocationAndRadius[0],sphereLocationAndRadius[1],sphereLocationAndRadius[2]);
-                spheres.push_back(Sphere(sphereLocation,materialColor,sphereLocationAndRadius.at(3)));
+            bool foundSphere = false;
+            while (!foundSphere && !inputFile.eof()){
+                if (input == "sphere"){
+                    sphereLocationAndRadius = getInputs();
+                    Ray sphereLocation(sphereLocationAndRadius[0],sphereLocationAndRadius[1],sphereLocationAndRadius[2]);
+                    spheres.push_back(Sphere(sphereLocation,materialColor,sphereLocationAndRadius.at(3)));
+                    foundSphere = true;
+                    break;
+                } else {
+                    inputFile >> input;
+                }
             }
+
+            if (!foundSphere){
+                break;
+            }
+
+            inputFile.seekg(holdPosition);
+
         } else if (input == "light"){
             std::vector<double> lightInput = getInputs();
             Ray position(lightInput[0],lightInput[1],lightInput[2]);
