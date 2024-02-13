@@ -14,7 +14,7 @@ RayCast::RayCast(Input userInput, Output image){
 void RayCast::calcViewingWindow(){
     w = normalizeRay(inputFromUser->getViewDir())*-1;
     // w.print("w: ");
-    printVector(inputFromUser->getUpDir(), "upDir: ");
+    // printVector(inputFromUser->getUpDir(), "upDir: ");
     u = normalizeRay(crossProduct(inputFromUser->getViewDir(), inputFromUser->getUpDir()));
     // u.print("u: ");
     v = normalizeRay(crossProduct(u, inputFromUser->getViewDir()));

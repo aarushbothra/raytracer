@@ -76,9 +76,11 @@ Input::Input(std::string filename){
 
         } else if (input == "light"){
             std::vector<double> lightInput = getInputs();
-            Ray position(lightInput[0],lightInput[1],lightInput[2]);
-            LightSource newLight(position, lightInput[3], lightInput[4]);
-            lights.push_back(newLight);
+            if (lightInput.size() > 5){
+                Ray position(lightInput[0],lightInput[1],lightInput[2]);
+                LightSource newLight(position, lightInput[3], lightInput[4]);
+                lights.push_back(newLight);
+            }
         }
         std::cout << input << "\n";
         
