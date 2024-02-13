@@ -55,7 +55,7 @@ void RayCast::calcViewRays(){
     for(int j=0;j<height;j++){
         for (int i=0;i<width;i++){
             
-            std::vector<double> pixelColor = checkSpheres(normalizeRay(ul + (deltaV*(j)) + (deltaH*(i))));
+            std::vector<double> pixelColor = checkSpheres(normalizeRay(ul + (deltaV*(j)) + (deltaH*(i))), inputFromUser->getViewOrigin());
             userImage->modPixel(pixelColor[0],pixelColor[1],pixelColor[2],i,j);
 
         }
@@ -63,12 +63,11 @@ void RayCast::calcViewRays(){
     
 }
 
-std::vector<double> RayCast::checkSpheres(Ray input){
+std::vector<double> RayCast::checkSpheres(Ray input, Ray viewOrigin){
     std::vector<double> pixelColor = inputFromUser->getBackgroundColor();
     std::vector<Sphere> spheres = inputFromUser->getSpheres();
     std::vector<double> distance;
     // std::cout << "spheres size: " << spheres.size() << std::endl;
-    Ray viewOrigin(inputFromUser->getViewOrigin());
     // std::cout << "checking sphere" << std::endl;
     for (int i=0;i<spheres.size();i++){
         // input.print("input: ");
@@ -123,19 +122,26 @@ std::vector<double> RayCast::checkSpheres(Ray input){
         }
     }
     
-    if (least >= 0){
-        pixelColor = spheres.at(leastIndex).getMaterial();
-        if (pixelColor.size() > 3){
-            //calc phong illumination
-            Ray intersectPos = viewOrigin+(input*distance[leastIndex]);
-            pixelColor = shadeRay(input, spheres.at(leastIndex), intersectPos);
+    if (viewOrigin == inputFromUser->getViewOrigin()){
+        if (least >= 0){
+            pixelColor = spheres.at(leastIndex).getMaterial();
+            if (pixelColor.size() > 3){
+                //calc phong illumination
+                Ray intersectPos = viewOrigin+(input*distance[leastIndex]);
+                pixelColor = shadeRay(spheres.at(leastIndex), intersectPos);
+            }
+        }
+    } else {
+        if (least>1.0e-10){
+            
+            pixelColor = {2};
         }
     }
     
     return pixelColor;
 }
 
-std::vector<double> RayCast::shadeRay(Ray input, Sphere sphereAtRay, Ray intersectPos){
+std::vector<double> RayCast::shadeRay(Sphere sphereAtRay, Ray intersectPos){
     std::vector<double> output(3);
     // std::vector<Ray> nVec;
     // std::vector<Ray> lVec;
@@ -154,8 +160,14 @@ std::vector<double> RayCast::shadeRay(Ray input, Sphere sphereAtRay, Ray interse
         Ray vVec = normalizeRay(inputFromUser->getViewOrigin()-intersectPos);
         Ray hVec = normalizeRay((lVec+vVec));
         
-        colorSum = colorSum + (((sphereAtRay.KdOdLam*min(0,dotProduct(nVec,lVec))) + (sphereAtRay.KsOsLam*pow(min(0,dotProduct(nVec,hVec)),sphereAtRay.n)))*light.getIntensity());
+        
         // std:: cout << "N dot L" << dotProduct(nVec,lVec) << std::endl;
+        std::vector<double> trueVector = {2};
+        if (checkSpheres(lVec, intersectPos) != trueVector){
+            colorSum = colorSum + (((sphereAtRay.KdOdLam*min(0,dotProduct(nVec,lVec))) + (sphereAtRay.KsOsLam*pow(min(0,dotProduct(nVec,hVec)),sphereAtRay.n)))*light.getIntensity());
+        } else {
+            // std::cout << "sphere intersect\n";
+        }
     }
 
     colorSum = colorSum + sphereAtRay.KaOdLam;
