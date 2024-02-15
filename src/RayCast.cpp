@@ -121,7 +121,7 @@ std::vector<double> RayCast::checkSpheres(Ray input, Ray viewOrigin){
         }
     } else {
         if (least!=-1){
-            pixelColor = {2};
+            pixelColor = {(distance[leastIndex])};
         }
     }
     
@@ -140,17 +140,19 @@ std::vector<double> RayCast::shadeRay(Sphere sphereAtRay, Ray intersectPos){
         } else {
             lVec = (normalizeRay(light.getPosition()-intersectPos));
         }
-
-        std::vector<double> trueVector = {2};
-        if (checkSpheres(lVec, intersectPos) == trueVector){
-            continue;
+        std::vector<double> nearestSphere = checkSpheres(lVec, intersectPos);
+        if (nearestSphere.size()==1){
+            if (nearestSphere[0] < distance(light.getPosition(), intersectPos)){
+                continue;
+            }
+            
         } 
 
         Ray nVec = (normalizeRay((intersectPos-sphereAtRay.getLocation())*(1/sphereAtRay.getRadius())));
         Ray vVec = normalizeRay(inputFromUser->getViewOrigin()-intersectPos);
         Ray hVec = normalizeRay((lVec+vVec));
         
-        colorSum = colorSum + (((sphereAtRay.KdOdLam*min(0,dotProduct(nVec,lVec))) + (sphereAtRay.KsOsLam*pow(min(0,dotProduct(nVec,hVec)),sphereAtRay.n)))*light.getIntensity());
+        colorSum = colorSum + (((sphereAtRay.KdOdLam*min(0,dotProduct(nVec,lVec))) + (sphereAtRay.KsOsLam*pow(min(0,dotProduct(nVec,hVec)),sphereAtRay.n)))*light.getIntensity()*light.getAttenFactor(distance(light.getPosition(),intersectPos)));
     }
 
     colorSum = colorSum + sphereAtRay.KaOdLam;
@@ -215,4 +217,12 @@ double RayCast::min(double minimum, double input){
     } else {
         return input;
     }
+}
+
+double RayCast::distance(Ray a, Ray b){
+    double output;
+    for (int i=0;i<3;i++){
+        output = output + pow(a[i]-b[i],2);
+    }
+    return sqrt(output);
 }

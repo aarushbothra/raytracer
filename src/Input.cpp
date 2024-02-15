@@ -81,6 +81,13 @@ Input::Input(std::string filename){
                 LightSource newLight(position, lightInput[3], lightInput[4]);
                 lights.push_back(newLight);
             }
+        } else if (input == "attlight"){
+            std::vector<double> lightInput = getInputs();
+            if (lightInput.size() > 5){
+                Ray position(lightInput[0],lightInput[1],lightInput[2]);
+                LightSource newLight(position, lightInput[3], lightInput[4],lightInput[5],lightInput[6],lightInput[7]);
+                lights.push_back(newLight);
+            }
         }
         // std::cout << input << "\n";
         

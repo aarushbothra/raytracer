@@ -37,5 +37,6 @@ class RayCast{
         std::vector<double> shadeRay(Sphere sphereAtRay, Ray intersectPos);//calculates shadows from direct light interaction as well as objects
         double dotProduct(Ray a, Ray b);
         double min(double minimum, double input);//checks if input is below minumum. if true, return minimum, otherwise return input
+        double distance(Ray a, Ray b);
 };
 
