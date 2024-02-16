@@ -84,8 +84,11 @@ std::vector<double> RayCast::checkSpheres(Ray input, Ray viewOrigin){
         double C =  cTemp.sum() - pow(spheres.at(i).getRadius(),2);
         double minus = (-B-sqrt((B*B)-(4*C*A)))/(2*A);
         double plus = (-B+sqrt((B*B)-(4*C*A)))/(2*A);
-
+        if (minus > 0 || plus > 0){
+            std::cout << "distance plus: " << plus << " distance minus: " << minus << std::endl;
+        }
         if(plus >= error && minus >= error){
+            std::cout << "sphere" << std::endl;
             if (plus >= minus){
                 distance.push_back(minus);
             } else {
@@ -106,6 +109,7 @@ std::vector<double> RayCast::checkSpheres(Ray input, Ray viewOrigin){
             if (distance.at(i) < least || least == -1){
                 least = distance.at(i);
                 leastIndex = i;
+
             }
         }
     }
@@ -142,10 +146,11 @@ std::vector<double> RayCast::shadeRay(Sphere sphereAtRay, Ray intersectPos){
         }
         std::vector<double> nearestSphere = checkSpheres(lVec, intersectPos);
         if (nearestSphere.size()==1){
-            if (nearestSphere[0] < distance(light.getPosition(), intersectPos)){
+            if (nearestSphere[0] < distance(light.getPosition(), intersectPos) && !light.isDirectional()){
+                continue;
+            } else if (light.isDirectional()){
                 continue;
             }
-            
         } 
 
         Ray nVec = (normalizeRay((intersectPos-sphereAtRay.getLocation())*(1/sphereAtRay.getRadius())));
