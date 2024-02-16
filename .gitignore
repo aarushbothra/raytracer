@@ -2,3 +2,5 @@ raytracer1a
 *.pdf
 *.ppm
 *.txt
+*.png
+*.o

@@ -7,7 +7,6 @@ all: raytracer1a
 raytracer1a: main.o Input.o Output.o RayCast.o Ray.o Sphere.o
 	make deletePrevious
 	$(CXX) $(CXXFLAGS) main.o Input.o Output.o RayCast.o Ray.o Sphere.o -o raytracer1a 
-	make postClean
 
 main.o: src/main.cpp
 	$(CXX) $(CXXFLAGS) -c src/main.cpp -o main.o 
