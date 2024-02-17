@@ -7,3 +7,4 @@ raytracer*
 *.png
 writeups
 *.zip
+.DS_Store
