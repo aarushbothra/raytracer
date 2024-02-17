@@ -25,7 +25,9 @@ int main(int argc, char *argv[]){
 
     Output image(userInput);
     RayCast rayCaster(userInput, image);
-    
+
+    image.generateImage();
+    std::cout << "done\n";
     return 0;
 }
 

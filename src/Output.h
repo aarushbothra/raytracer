@@ -11,6 +11,7 @@ class Output{
     public:
         Output(Input userInput);
         void modPixel(double red, double green, double blue, int posX, int posY);//modifies a single pixel
+        std::vector<double> getPixel(int posX, int posY);
         void generateImage();//generates a ppm image by writing the contents of imageArr to a file of the same name as filename
     private:
         std::string filename;
@@ -19,4 +20,5 @@ class Output{
         int width;
         int height;
         void printArray(double array[], int size);
+        double max(double maxNum, double input);
 };

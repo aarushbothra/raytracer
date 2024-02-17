@@ -5,29 +5,27 @@ RayCast::RayCast(Input userInput, Output image){
     inputFromUser = &userInput;
     userImage = &image;
     std::cout << "calc image" << std::endl;
-    calcImage(image);
-
+    calcViewingWindow();
+    calcCorners();
+    calcViewRays();
+    
 }
-
 
 void RayCast::calcViewingWindow(){
     w = normalizeRay(inputFromUser->getViewDir())*-1;
-    w.print("w: ");
-    printVector(inputFromUser->getUpDir(), "upDir: ");
+    // w.print("w: ");
+    // printVector(inputFromUser->getUpDir(), "upDir: ");
     u = normalizeRay(crossProduct(inputFromUser->getViewDir(), inputFromUser->getUpDir()));
-    u.print("u: ");
+    // u.print("u: ");
     v = normalizeRay(crossProduct(u, inputFromUser->getViewDir()));
-    v.print("v: ");
+    // v.print("v: ");
 
     viewWindowWidth = 2*viewingDistance*tan(degreesToRadians(0.5*inputFromUser->getHFOV()));
-    std::cout << "view window width: " << viewWindowWidth << std::endl;
+    // std::cout << "view window width: " << viewWindowWidth << std::endl;
     aspectRatio = inputFromUser->getImageSize()[0]/inputFromUser->getImageSize()[1];
-    std::cout << "aspectRatio: " << aspectRatio << std::endl;
+    // std::cout << "aspectRatio: " << aspectRatio << std::endl;
     viewWindowHeight = viewWindowWidth*(1/aspectRatio);
-    // double vFOV = radiansToDegrees(2*atan((0.5*tan(degreesToRadians(0.5*inputFromUser->getHFOV())))));
-    // std::cout << "vFOV: " << vFOV << std::endl;
-    // viewWindowHeight = 2*viewingDistance*tan(degreesToRadians(0.5*vFOV));
-    std::cout << "view window height: " << viewWindowHeight << std::endl;
+    // std::cout << "view window height: " << viewWindowHeight << std::endl;
 }
 
 void RayCast::calcCorners(){
@@ -35,59 +33,27 @@ void RayCast::calcCorners(){
     Ray viewDir(inputFromUser->getViewDir());
     viewDir = normalizeRay(viewDir);
     ll = viewOrigin + (viewDir*viewingDistance) - (u*(viewWindowWidth/2)) - (v*(viewWindowHeight/2));
-    ll.print("ll: ");
+    // ll.print("ll: ");
     ul = viewOrigin + (viewDir*viewingDistance) - (u*(viewWindowWidth/2)) + (v*(viewWindowHeight/2));
-    ul.print("ul: ");
+    // ul.print("ul: ");
     lr = viewOrigin + (viewDir*viewingDistance) + (u*(viewWindowWidth/2)) - (v*(viewWindowHeight/2));
-    lr.print("lr: ");
+    // lr.print("lr: ");
     ur = viewOrigin + (viewDir*viewingDistance) + (u*(viewWindowWidth/2)) + (v*(viewWindowHeight/2));
-    ur.print("ur: ");
-}
-
-void RayCast::calcImage(Output image){
-    calcViewingWindow();
-    calcCorners();
-    calcViewRays();
-    // int width = inputFromUser->getImageSize()[0];
-    
-    // int height = inputFromUser->getImageSize()[1];
-    // for(int j=0;j<height;j++){
-    //     for (int i=0;i<width;i++){
-    //         // std::cout << "i: " << i << " j: " << j << std::endl;
-    //         // rays.at(j).at(i).print("ray: ");
-    //         std::vector<double> pixelColor = checkSpheres(rays.at(j).at(i));
-    //         // if (i == 1 && j == 1){
-    //         //     std::cout << (rays.at(j).at(i) == testRay) << std::endl;
-    //         // }
-    //         image.modPixel(pixelColor[0],pixelColor[1],pixelColor[2],i,j);
-    //     }
-    // }
-
-    image.generateImage();
+    // ur.print("ur: ");
 }
 
 void RayCast::calcViewRays(){
     double width = inputFromUser->getImageSize()[0];
     double height = inputFromUser->getImageSize()[1];
     Ray deltaH =(ur-ul)*(1/(width-1));
-    deltaH.print("deltaH: ");
+    // deltaH.print("deltaH: ");
     Ray deltaV =(ll-(ul)) * (1/(height-1));
-    deltaV.print("deltaV: ");
-    std::cout << "calculating rays" << std::endl;
+    // deltaV.print("deltaV: ");
+    // std::cout << "calculating rays" << std::endl;
     for(int j=0;j<height;j++){
         for (int i=0;i<width;i++){
             
-            if (i == 50&& j == 239){
-                (deltaV*(j)).print("deltaV*j: ");
-                std::cout << "i: " << i << " j: " << j << std::endl;
-                testRay = normalizeRay(ul + (deltaV*(j)) + (deltaH*(i)));
-                testRay.print("testRay: ");
-                Ray temporary = ul + (deltaV*(j)) + (deltaH*(i));
-                temporary.print("testRay unnormalized: ");
-                temporary.square();
-                std::cout << "testRay magnitude: " << sqrt(temporary.sum()) << std::endl;
-            }
-            std::vector<double> pixelColor = checkSpheres(normalizeRay(ul + (deltaV*(j)) + (deltaH*(i))));
+            std::vector<double> pixelColor = checkSpheres(normalizeRay(ul + (deltaV*(j)) + (deltaH*(i))), inputFromUser->getViewOrigin());
             userImage->modPixel(pixelColor[0],pixelColor[1],pixelColor[2],i,j);
 
         }
@@ -95,59 +61,42 @@ void RayCast::calcViewRays(){
     
 }
 
-std::vector<double> RayCast::checkSpheres(Ray input){
+std::vector<double> RayCast::checkSpheres(Ray input, Ray viewOrigin){
     std::vector<double> pixelColor = inputFromUser->getBackgroundColor();
     std::vector<Sphere> spheres = inputFromUser->getSpheres();
     std::vector<double> distance;
-    // std::cout << "spheres size: " << spheres.size() << std::endl;
-    Ray viewOrigin(inputFromUser->getViewOrigin());
-    // std::cout << "checking sphere" << std::endl;
+    double error = 1.0e-10;
     for (int i=0;i<spheres.size();i++){
-        // input.print("input: ");
+        //check if viewOrigin is on current sphere. if so, skip calculations
+        if ((pow((viewOrigin[0]-spheres[i].getLocation()[0]),2) + pow((viewOrigin[1]-spheres[i].getLocation()[1]),2) + pow((viewOrigin[2]-spheres[i].getLocation()[2]),2)) == pow(spheres[i].getRadius(),2)){
+            distance.push_back(-1);
+            continue;
+        }
+
         Ray aTemp = input;
         aTemp.square();
 
         double A = aTemp.sum();
-
         double B = (input*(viewOrigin+(spheres.at(i).getLocation()*-1))).sum()*2;
-        // std::cout << "B: " << B << std::endl;
-        // viewOrigin.print("viewOrigin: ");
-        // spheres.at(i).getLocation().print("sphere Location: ");
 
         Ray cTemp = (viewOrigin+(spheres.at(i).getLocation()*-1));
-        // cTemp.print("ctemp: ");
         cTemp.square();
         double C =  cTemp.sum() - pow(spheres.at(i).getRadius(),2);
         double minus = (-B-sqrt((B*B)-(4*C*A)))/(2*A);
         double plus = (-B+sqrt((B*B)-(4*C*A)))/(2*A);
-
-        if (input == testRay){
-            std::cout<<"A: " << A << std::endl;
-            std::cout << "B: " << B << std::endl;
-            viewOrigin.print("viewOrigin: ");
-            spheres.at(i).getLocation().print("sphere Location: ");
-            std::cout << "C: " << C << std::endl;
-            std::cout << "minus: " << minus << std::endl;
-            std::cout << "plus: " << plus << std::endl;
-            std::cout << "determinant: " <<  (B*B)-(4*C) << std::endl;
-        }
-
-        if(plus >= 0 && minus >= 0){
+        if(plus >= error && minus >= error){
             if (plus >= minus){
                 distance.push_back(minus);
             } else {
                 distance.push_back(plus);
             }
-        } else if (plus >= 0){
+        } else if (plus >= error){
             distance.push_back(plus);
-        } else if (minus >= 0){
+        } else if (minus >= error){
             distance.push_back(minus);
         } else {
             distance.push_back(-1);
         }
-    }
-    if (input == testRay){
-        printVector(distance, "distance: ");
     }
     double least = -1;
     int leastIndex;
@@ -156,24 +105,63 @@ std::vector<double> RayCast::checkSpheres(Ray input){
             if (distance.at(i) < least || least == -1){
                 least = distance.at(i);
                 leastIndex = i;
+
             }
         }
     }
-
-    if (least >= 0){
-        
-        pixelColor = spheres.at(leastIndex).getMaterial();
-        if (input == testRay){
-            std::cout << "found sphere" << std::endl;
-            printVector(pixelColor, "pixelColor: ");
+    
+    if (viewOrigin == inputFromUser->getViewOrigin()){
+        if (least >= 0){
+            pixelColor = spheres.at(leastIndex).getMaterial();
+            if (pixelColor.size() > 3){
+                //calc phong illumination
+                Ray intersectPos = viewOrigin+(input*distance[leastIndex]);
+                pixelColor = shadeRay(spheres.at(leastIndex), intersectPos);
+            }
+        }
+    } else {
+        if (least!=-1){
+            pixelColor = {(distance[leastIndex])};
         }
     }
-
-    
-       
-    
     
     return pixelColor;
+}
+
+std::vector<double> RayCast::shadeRay(Sphere sphereAtRay, Ray intersectPos){
+    std::vector<double> output(3);
+    Ray colorSum;
+    std::vector<LightSource> lights = inputFromUser->getLights();
+
+    for (auto light:lights){
+        Ray lVec;
+        if(light.isDirectional()){
+            lVec = (normalizeRay(light.getPosition()*-1));
+        } else {
+            lVec = (normalizeRay(light.getPosition()-intersectPos));
+        }
+        std::vector<double> nearestSphere = checkSpheres(lVec, intersectPos);
+        if (nearestSphere.size()==1){
+            if (nearestSphere[0] < distance(light.getPosition(), intersectPos) && !light.isDirectional()){
+                continue;
+            } else if (light.isDirectional()){
+                continue;
+            }
+        } 
+
+        Ray nVec = (normalizeRay((intersectPos-sphereAtRay.getLocation())*(1/sphereAtRay.getRadius())));
+        Ray vVec = normalizeRay(inputFromUser->getViewOrigin()-intersectPos);
+        Ray hVec = normalizeRay((lVec+vVec));
+        
+        colorSum = colorSum + (((sphereAtRay.KdOdLam*min(0,dotProduct(nVec,lVec))) + (sphereAtRay.KsOsLam*pow(min(0,dotProduct(nVec,hVec)),sphereAtRay.n)))*light.getIntensity()*light.getAttenFactor(distance(light.getPosition(),intersectPos)));
+    }
+
+    colorSum = colorSum + sphereAtRay.KaOdLam;
+    output[0] = colorSum[0];
+    output[1] = colorSum[1];
+    output[2] = colorSum[2];
+
+    return output;
 }
 
 Ray RayCast::normalizeRay(Ray input){
@@ -200,7 +188,6 @@ Ray RayCast::crossProduct(Ray a, Ray b){
     return Ray(output);
 }
 
-
 void RayCast::printVector(std::vector<double> input, std::string message){
     std::cout << message;
     for (int i=0;i<input.size();i++){
@@ -217,4 +204,26 @@ double RayCast::radiansToDegrees(double radians){
     return radians*(180/M_PI);
 }
 
+double RayCast::dotProduct(Ray a, Ray b){
+    double sum = 0;
+    for (int i=0;i<3;i++){
+        sum += a[i]*b[i];
+    }
+    return sum;
+}
 
+double RayCast::min(double minimum, double input){
+    if (input < minimum){
+        return minimum;
+    } else {
+        return input;
+    }
+}
+
+double RayCast::distance(Ray a, Ray b){
+    double output;
+    for (int i=0;i<3;i++){
+        output = output + pow(a[i]-b[i],2);
+    }
+    return sqrt(output);
+}

@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include "Sphere.h"
+#include "LightSource.h"
 #pragma once
 
 
@@ -15,11 +16,13 @@ class Input{
         double getHFOV();
         std::vector<double> getImageSize();//returns width,height
         std::vector<double> getBackgroundColor();//all colors return RGB
-        std::vector<Sphere> getSpheres();//x,y,z location and radius
+        std::vector<Sphere> getSpheres();//returns the sphere's location and radius in a sphere object
+        std::vector<LightSource> getLights(){return lights;}
         void printInput();
         std::string getFilename();
         bool getIsComplete(){return isComplete;}//checks if all necessary inputs have been given
     private:
+        std::vector<LightSource> lights;
         std::string filename;
         std::vector<double> viewOrigin;
         std::vector<double> viewDir;
@@ -28,7 +31,7 @@ class Input{
         std::vector<double> imageSize;
         std::vector<double> backgroundColor;
         std::vector<Sphere> spheres;
-        std::vector<double> getInputs(int numInputs);//read from file. reads the next numInputs items from file.
+        std::vector<double> getInputs();//read from file. reads until newline, then returns vector of inputs
         int fileCurrPos = 0;
         void printVector(std::vector<double> input);    
         bool isComplete = false;

@@ -30,7 +30,7 @@ class Ray{
             }
             return Ray(temp);
         }
-        friend Ray operator*(Ray ray1, Ray ray2){
+        friend Ray operator*(Ray ray1, Ray ray2){//dot product
             std::vector<double> temp;
             for (int i=0;i<3;i++){
                 temp.push_back(ray1[i]*ray2[i]);

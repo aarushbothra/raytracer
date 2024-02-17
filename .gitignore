@@ -1,5 +1,9 @@
-raytracer*
 *.pdf
 *.ppm
 *.txt
 *.o
+raytracer*
+.vscode/*
+*.png
+writeups
+*.zip

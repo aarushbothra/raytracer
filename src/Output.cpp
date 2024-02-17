@@ -31,6 +31,16 @@ void Output::modPixel(double red, double green, double blue, int posX, int posY)
     // generateImage(); 
 }
 
+std::vector<double> Output::getPixel(int posX, int posY){
+    std::vector<double> output;
+    output.push_back(imageArr[posY*width+posX][0]);
+    output.push_back(imageArr[posY*width+posX][1]);
+    output.push_back(imageArr[posY*width+posX][2]);
+
+    return output;
+    // generateImage(); 
+}
+
 void Output::generateImage(){
     std::fstream image;
     int linePos = 0;
@@ -44,7 +54,7 @@ void Output::generateImage(){
     for (int i=0;i<height;i++){
         for (int j=0;j<width;j++){
             // printArray(imageArr[i*height+j], 3);
-            image << imageArr[i*width+j][0]*255 << " " << imageArr[i*width+j][1]*255 << " " << imageArr[i*width+j][2]*255 << " ";
+            image << max(255,imageArr[i*width+j][0]*255) << " " << max(255,imageArr[i*width+j][1]*255) << " " << max(255,imageArr[i*width+j][2]*255) << " ";
             linePos++;
             if (linePos == 70) {
                 image << std::endl;
@@ -65,4 +75,11 @@ void Output::printArray(double array[], int size){
         std::cout << array[i] << " ";
     }
     std::cout << std::endl;   
+}
+
+double Output::max(double maxNum, double input){
+    if (input > maxNum){
+        return maxNum;
+    }
+    return input;
 }
