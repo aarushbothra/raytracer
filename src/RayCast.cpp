@@ -84,11 +84,7 @@ std::vector<double> RayCast::checkSpheres(Ray input, Ray viewOrigin){
         double C =  cTemp.sum() - pow(spheres.at(i).getRadius(),2);
         double minus = (-B-sqrt((B*B)-(4*C*A)))/(2*A);
         double plus = (-B+sqrt((B*B)-(4*C*A)))/(2*A);
-        if (minus > 0 || plus > 0){
-            std::cout << "distance plus: " << plus << " distance minus: " << minus << std::endl;
-        }
         if(plus >= error && minus >= error){
-            std::cout << "sphere" << std::endl;
             if (plus >= minus){
                 distance.push_back(minus);
             } else {

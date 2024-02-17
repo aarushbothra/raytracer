@@ -32,7 +32,7 @@ class LightSource{
             return intensity;
         }
         double getAttenFactor(double d){
-            if (attenuatable){
+            if (attenuatable && !directional){
                 return 1/(c1 + c2*d + c3*d*d);
             } else {
                 return 1;
