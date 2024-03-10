@@ -77,9 +77,9 @@ void Output::printArray(double array[], int size){
     std::cout << std::endl;   
 }
 
-double Output::max(double maxNum, double input){
+int Output::max(int maxNum, double input){
     if (input > maxNum){
         return maxNum;
     }
-    return input;
+    return (int)input;
 }
