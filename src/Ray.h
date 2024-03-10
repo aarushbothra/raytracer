@@ -9,42 +9,29 @@ class Ray{
         Ray(std::vector<double> input);
         Ray();
         friend Ray operator+(Ray ray1, Ray ray2){
-            std::vector<double> temp;
-            for (int i=0;i<3;i++){
-                temp.push_back(ray1[i]+ray2[i]);
-            }
-            return Ray(temp);
+            return Ray(ray1[0]+ray2[0],ray1[1]+ray2[1],ray1[2]+ray2[2]);
         }
         friend Ray operator-(Ray ray1, Ray ray2){
-            std::vector<double> temp;
-            for (int i=0;i<3;i++){
-                temp.push_back(ray1[i]-ray2[i]);
-            }
-            return Ray(temp);
+            return Ray(ray1[0]-ray2[0],ray1[1]-ray2[1],ray1[2]-ray2[2]);
         }
         double operator[](int i);
         friend Ray operator*(Ray ray1, double scalar){
-            std::vector<double> temp;
-            for (int i=0;i<3;i++){
-                temp.push_back(ray1[i]*scalar);
-            }
-            return Ray(temp);
+            return Ray(ray1[0]*scalar,ray1[1]*scalar,ray1[2]*scalar);
+        }
+        friend Ray operator*( double scalar, Ray ray1){
+            return Ray(ray1[0]*scalar,ray1[1]*scalar,ray1[2]*scalar);
         }
         friend Ray operator*(Ray ray1, Ray ray2){//dot product
-            std::vector<double> temp;
-            for (int i=0;i<3;i++){
-                temp.push_back(ray1[i]*ray2[i]);
-            }
-            return Ray(temp);
+            return Ray(ray1[0]*ray2[0],ray1[1]*ray2[1],ray1[2]*ray2[2]);
         }
         void print(std::string message);
         int size();
         double sum();
         void square();
         friend bool operator==(const Ray &a, const Ray &b){
-            return a.rayStorage == b.rayStorage;
+            return (a.a == b.a && a.b == b.b && a.c == b.c);
         }
     private:
-        std::vector<double> rayStorage;
+        double a,b,c;
     
 };
