@@ -20,5 +20,5 @@ class Output{
         int width;
         int height;
         void printArray(double array[], int size);
-        double max(double maxNum, double input);
+        int max(int maxNum, double input);
 };
