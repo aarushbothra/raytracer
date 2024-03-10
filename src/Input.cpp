@@ -8,6 +8,8 @@ Input::Input(std::string filename){
     std::string input;
     inputFile.open(filename);
     int inputCounter = 0;
+    vertices.push_back(Ray());
+    vertexNormals.push_back(Ray());
     while (!inputFile.eof() && inputFile.is_open()){
         inputFile >> input;
         // std::cout << "input: " << input << std::endl;
@@ -88,13 +90,35 @@ Input::Input(std::string filename){
                 LightSource newLight(position, lightInput[3], lightInput[4],lightInput[5],lightInput[6],lightInput[7]);
                 lights.push_back(newLight);
             }
+        } else if (!strcmp(input.c_str(), "f")) {
+            std::string input = "";
+            std::getline(inputFile, input);
+            int i,j,k;
+            int a,b,c;
+            const char* string = input.c_str();
+            /*if (sscanf(string, "%d/%d/%d %d/%d/%d %d/%d/%d" ) == 9) {
+            } else*/ if (sscanf(string, "%d//%d %d//%d %d//%d", i, a, j, b, k, c) == 6) {
+                faces.push_back(Face(vertices[i],vertices[j],vertices[k],vertexNormals[a],vertexNormals[b],vertexNormals[c]));
+            // } else if (sscanf(string, "%d/%d %d/%d %d/%d") == 6) {
+            } else if (sscanf(string, "%d %d %d", i, j, k) == 3) {
+                faces.push_back(Face(vertices[i],vertices[j],vertices[k]));
+            } else {
+                throw stderr;
+            }
+        } else if (input == "v"){
+            Ray vertexInput = getInputs();
+            vertices.push_back(vertexInput);
+        } else if (input == "vn") {
+            Ray vertexNormalInput = getInputs();
+            vertexNormals.push_back(vertexNormalInput);
         }
+
         // std::cout << input << "\n";
         
     }
 
     inputFile.close();
-    if (inputCounter == 6 && spheres.size() > 0 && lights.size() > 0){
+    if (inputCounter == 6 && (spheres.size() > 0 || faces.size()>0) && lights.size() > 0){
         isComplete = true;
     } 
 }
@@ -151,6 +175,12 @@ void Input::printInput(){
     }
     for (int i=0;i<lights.size();i++){
         lights.at(i).print("light ");
+    }
+    for (int i=0;i<vertices.size();i++){
+        vertices.at(i).print("v: ");
+    }
+    for(int i=0;i<vertexNormals.size();i++){
+        vertexNormals.at(i).print("vn: ");
     }
     
 }

@@ -4,6 +4,7 @@
 #include <iostream>
 #include "Sphere.h"
 #include "LightSource.h"
+#include "Face.h"
 #pragma once
 
 
@@ -35,5 +36,8 @@ class Input{
         int fileCurrPos = 0;
         void printVector(std::vector<double> input);    
         bool isComplete = false;
+        std::vector<Ray> vertices;
+        std::vector<Ray> vertexNormals;
+        std::vector<Face> faces;
 
 };
