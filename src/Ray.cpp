@@ -1,25 +1,35 @@
 #include "Ray.h"
 
 Ray::Ray(double i, double j, double k){
-    rayStorage = std::vector<double>{i,j,k};
+    a = i;
+    b = j;
+    c = k;
 }
 
 Ray::Ray(std::vector<double> input){
-    rayStorage = std::vector<double>(3);
-    for (int i=0;i<3;i++){
-        rayStorage.at(i) = (input.at(i));
-    }
+    a = input[0];
+    b = input[1];
+    c = input[2];
 }
 
 Ray::Ray(){
-    std::vector<double> temp(3);
-    rayStorage = temp;
+    a = 0;
+    b = 0;
+    c = 0;
 }
 
 
 double Ray::operator[](int i){
-    // std::cout << "\n    "<< i << ": " << rayStorage.at(i) << std::endl;
-    return rayStorage.at(i);
+    switch (i){
+        case 0:
+            return a;
+        case 1:
+            return b;
+        case 2:
+            return c;
+        default:
+            throw std::out_of_range ("Index out of bounds");
+    }
 }
 
 
@@ -29,24 +39,18 @@ int Ray::size(){
 
 void Ray::print(std::string message){
 
-    std::cout << message;
-    for (int i=0;i<3;i++){
-        std::cout << rayStorage.at(i) << " ";
-    }
+    std::cout << message << " " << a << " " << b << " " << c;
     std::cout << std::endl;
 
 }
 
 double Ray::sum(){
-    double sum = 0;
-    for (int i=0;i<3;i++){
-        sum += rayStorage.at(i);
-    }
-    return sum;
+    return a + b + c;
+    
 }
 
 void Ray::square(){
-    for (int i=0;i<3;i++){
-        rayStorage.at(i) = rayStorage.at(i)*rayStorage.at(i);
-    }
+    a = a*a;
+    b = b*b;
+    c = c*c;
 }
