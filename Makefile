@@ -4,9 +4,9 @@ OUTFILE=raytracer1c
 .DEFAULT_GOAL := all
 all: $(OUTFILE)
 
-$(OUTFILE): main.o Input.o Output.o RayCast.o Ray.o Sphere.o LightSource.o Face.o
+$(OUTFILE): main.o Input.o Output.o RayCast.o Ray.o Sphere.o LightSource.o Face.o Material.o
 	make deletePrevious
-	$(CXX) $(CXXFLAGS) main.o Input.o Output.o RayCast.o Ray.o Sphere.o LightSource.o Face.o -o $(OUTFILE) 
+	$(CXX) $(CXXFLAGS) main.o Input.o Output.o RayCast.o Ray.o Sphere.o LightSource.o Face.o Material.o -o $(OUTFILE) 
 
 main.o: src/main.cpp
 	$(CXX) $(CXXFLAGS) -c src/main.cpp -o main.o 
@@ -31,6 +31,9 @@ LightSource.o: src/LightSource.h src/LightSource.cpp
 
 Face.o: src/Face.h src/Face.cpp
 	$(CXX) $(CXXFLAGS) -c src/Face.cpp -o Face.o 
+
+Material.o: src/Material.h src/Material.cpp
+	$(CXX) $(CXXFLAGS) -c src/Material.cpp -o Material.o 
 
 
 .PHONY: all clean

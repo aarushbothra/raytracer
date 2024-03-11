@@ -64,6 +64,7 @@ void RayCast::calcViewRays(){
 std::vector<double> RayCast::checkSpheres(Ray input, Ray viewOrigin){
     std::vector<double> pixelColor = inputFromUser->getBackgroundColor();
     std::vector<Sphere> spheres = inputFromUser->getSpheres();
+    std::vector<Material> materials = inputFromUser->getMaterials();
     std::vector<double> distance;
     double error = 1.0e-10;
     for (int i=0;i<spheres.size();i++){
@@ -112,11 +113,11 @@ std::vector<double> RayCast::checkSpheres(Ray input, Ray viewOrigin){
     
     if (viewOrigin == inputFromUser->getViewOrigin()){
         if (least >= 0){
-            pixelColor = spheres.at(leastIndex).getMaterial();
+            pixelColor = materials.at(leastIndex).getMaterial();
             if (pixelColor.size() > 3){
                 //calc phong illumination
                 Ray intersectPos = viewOrigin+(input*distance[leastIndex]);
-                pixelColor = shadeRay(spheres.at(leastIndex), intersectPos);
+                pixelColor = shadeRay(spheres.at(leastIndex), intersectPos, materials.at(leastIndex));
             }
         }
     } else {
@@ -128,7 +129,7 @@ std::vector<double> RayCast::checkSpheres(Ray input, Ray viewOrigin){
     return pixelColor;
 }
 
-std::vector<double> RayCast::shadeRay(Sphere sphereAtRay, Ray intersectPos){
+std::vector<double> RayCast::shadeRay(Sphere sphereAtRay, Ray intersectPos, Material matAtRay){
     std::vector<double> output(3);
     Ray colorSum;
     std::vector<LightSource> lights = inputFromUser->getLights();
@@ -153,10 +154,10 @@ std::vector<double> RayCast::shadeRay(Sphere sphereAtRay, Ray intersectPos){
         Ray vVec = normalizeRay(inputFromUser->getViewOrigin()-intersectPos);
         Ray hVec = normalizeRay((lVec+vVec));
         
-        colorSum = colorSum + (((sphereAtRay.KdOdLam*min(0,dotProduct(nVec,lVec))) + (sphereAtRay.KsOsLam*pow(min(0,dotProduct(nVec,hVec)),sphereAtRay.n)))*light.getIntensity()*light.getAttenFactor(distance(light.getPosition(),intersectPos)));
+        colorSum = colorSum + (((matAtRay.KdOdLam*min(0,dotProduct(nVec,lVec))) + (matAtRay.KsOsLam*pow(min(0,dotProduct(nVec,hVec)),matAtRay.n)))*light.getIntensity()*light.getAttenFactor(distance(light.getPosition(),intersectPos)));
     }
 
-    colorSum = colorSum + sphereAtRay.KaOdLam;
+    colorSum = colorSum + matAtRay.KaOdLam;
     output[0] = colorSum[0];
     output[1] = colorSum[1];
     output[2] = colorSum[2];
