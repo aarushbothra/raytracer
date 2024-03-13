@@ -126,23 +126,18 @@ Input::Input(std::string filename){
 
             
             std::getline(inputFile, input);
-            const int length = input.length();
-            char* charArray = new char[length+1];
-            strcpy(charArray,input.c_str());
-            float i,j,k,r;
-            if (sscanf(charArray," %1f %2f %3f %4f", &i, &j, &k, &r) == 4){
-                spheres.push_back(Sphere(Ray(i,j,k),r));
-            } else if (sscanf(charArray," -%1f %2f %3f %4f", &i, &j, &k, &r) == 4){
-                spheres.push_back(Sphere(Ray(-i,j,k),r));
-            } else {
-                std::cout << "sphere not formatted correctly: " << charArray << std::endl;
+            std::stringstream sphere(input.substr(1));
+            std::string segment;
+            std::vector<double> sphereNums;
+            while(std::getline(sphere, segment, ' ')){
+                
+                if(segment != " "){
+                    sphereNums.push_back(stod(segment));
+            
+                }
             }
-            delete[] charArray;
-            sphereCount++;
-            // std::vector<double> sphereLocationAndRadius;       
-            // sphereLocationAndRadius = getInputs();
-            // Ray sphereLocation(sphereLocationAndRadius[0],sphereLocationAndRadius[1],sphereLocationAndRadius[2]);
-            // spheres.push_back(Sphere(sphereLocation,sphereLocationAndRadius.at(3)));
+                
+            spheres.push_back(Sphere(Ray(sphereNums[0],sphereNums[1],sphereNums[2]),sphereNums[3]));
         } 
         else if (input == "light"){
             std::vector<double> lightInput = getInputs();

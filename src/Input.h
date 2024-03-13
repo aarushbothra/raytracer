@@ -6,6 +6,7 @@
 #include "LightSource.h"
 #include "Face.h"
 #include "Material.h"
+#include <sstream>
 #pragma once
 
 

@@ -15,7 +15,7 @@ void RayCast::calcViewingWindow(){
     w = normalizeRay(inputFromUser->getViewDir())*-1;
     // w.print("w: ");
     // printVector(inputFromUser->getUpDir(), "upDir: ");
-    u = normalizeRay(crossProduct(inputFromUser->getViewDir(), inputFromUser->getUpDir()));
+    u = normalizeRay(crossProduct(inputFromUser->getViewDir(), Ray(inputFromUser->getUpDir())));
     // u.print("u: ");
     v = normalizeRay(crossProduct(u, inputFromUser->getViewDir()));
     // v.print("v: ");
@@ -66,7 +66,6 @@ std::vector<double> RayCast::getPixelColor(Ray input, Ray viewOrigin){
 
     Intersection rayIntersection = *checkIntersections(input, viewOrigin);
     if (rayIntersection.getSuccessfulIntersect()){
-        std::cout << "\nsuccesful intersect\n";
         // std::vector<double> material = (rayIntersection.getMaterial())->getMaterial();
         Material material = *rayIntersection.getMaterial();
         Ray intersectionPoint = *rayIntersection.getIntersectionPoint();
@@ -84,22 +83,6 @@ std::vector<double> RayCast::getPixelColor(Ray input, Ray viewOrigin){
             }
         }
     }
-    
-
-    // if (viewOrigin == inputFromUser->getViewOrigin()){//if not checking for shadow intersections
-    //     if (least >= 0){
-    //         pixelColor = materials.at(leastIndex).getMaterial();
-    //         if (pixelColor.size() > 3){
-    //             //calc phong illumination
-    //             Ray intersectPos = viewOrigin+(input*distance[leastIndex]);
-    //             pixelColor = shadeRay(spheres.at(leastIndex), intersectPos, materials.at(leastIndex));
-    //         }
-    //     }
-    // } else {
-    //     if (least!=-1){
-    //         pixelColor = {(distance[leastIndex])};
-    //     }
-    // }
 
     return pixelColor;
 
@@ -108,7 +91,7 @@ std::vector<double> RayCast::getPixelColor(Ray input, Ray viewOrigin){
 Intersection* RayCast::checkIntersections(Ray input, Ray viewOrigin){
     std::vector<Material> materials = inputFromUser->getMaterials();
     Intersection* output;
-    std::vector<double> distance = checkSphereIntersection(input);
+    std::vector<double> distance = checkSphereIntersection(input, viewOrigin);
     // std::vector<double> distanceFaces = checkFaceIntersection(input);
     // distance.insert(distance.end(),distanceFaces.begin(),distanceFaces.end());
 
@@ -149,12 +132,13 @@ std::vector<double> RayCast::checkFaceIntersection(Ray ray){
     return {-1};
 }
 
-std::vector<double> RayCast::checkSphereIntersection(Ray input){
+std::vector<double> RayCast::checkSphereIntersection(Ray input, Ray viewOrigin){
     std::vector<Sphere> spheres = inputFromUser->getSpheres();
-    std::vector<double> viewOrigin = inputFromUser->getViewOrigin();
+    // std::vector<double> viewOrigin = inputFromUser->getViewOrigin();
     std::vector<double> distance;
     double error = 1.0e-10;
     for (int i=0;i<spheres.size();i++){
+
         //check if viewOrigin is on current sphere. if so, skip calculations
         if (fabs((pow((viewOrigin[0]-spheres[i].getLocation()[0]),2) + pow((viewOrigin[1]-spheres[i].getLocation()[1]),2) + pow((viewOrigin[2]-spheres[i].getLocation()[2]),2)) - pow(spheres[i].getRadius(),2)) < error){
             distance.push_back(-1);
@@ -221,6 +205,7 @@ std::vector<LightSource> RayCast::shadeRay(Ray intersectPos){
     // Ray colorSum;
     std::vector<LightSource> visibleLights;
     std::vector<LightSource> lights = inputFromUser->getLights();
+    // return lights;
     for (auto light:lights) {
         Ray lVec;
         if(light.isDirectional()){
@@ -238,6 +223,8 @@ std::vector<LightSource> RayCast::shadeRay(Ray intersectPos){
                 if (distance(*(*nearestObject).getIntersectionPoint(),intersectPos) > distance(light.getPosition(), intersectPos)){
                     visibleLights.push_back(light);
                 }
+            } else {
+                visibleLights.push_back(light);
             }
         }
     }
