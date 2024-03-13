@@ -36,7 +36,6 @@ class Input{
         std::vector<double> imageSize;
         std::vector<double> backgroundColor;
         std::vector<Sphere> spheres;
-        std::vector<double> getInputs();//read from file. reads until newline, then returns vector of inputs
         int fileCurrPos = 0;
         void printVector(std::vector<double> input);    
         bool isComplete = false;

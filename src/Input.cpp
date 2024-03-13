@@ -15,59 +15,43 @@ Input::Input(std::string filename){
         inputFile >> input;
         // std::cout << "input: " << input << std::endl;
         if (input == "imsize"){
-            std::string input;
             std::getline(inputFile, input);
-            int width,height;
-            const int length = input.length();
-            char* string = new char[length+1];
-            strcpy(string,input.c_str());
-            if (sscanf(string, " %d %d\r", &width, &height) == 2) {
-                inputCounter++;
-                imageSize.push_back(width);
-                imageSize.push_back(height);
-            } else {
-                std::cout << "not found\n"; 
+            std::stringstream inputString(input.substr(1));
+            std::string segment;
+            while(std::getline(inputString, segment, ' ')){
+                
+                if(segment != " "){
+                    imageSize.push_back(stod(segment));
+            
+                }
             }
-            delete[] string;
+
         }
         else if (input == "eye"){
-            std::string input;
             std::getline(inputFile, input);
-            float i,j,k;
-            const int length = input.length();
-            char* string = new char[length+1];
-            strcpy(string,input.c_str());
-            if (sscanf(string, " %f %f %f\r", &i, &j, &k) == 3) {
-                inputCounter++;
-                viewOrigin.push_back(i);
-                viewOrigin.push_back(j);
-                viewOrigin.push_back(k);
-            } else {
-                std::cout << "not found\n"; 
+            std::stringstream inputString(input.substr(1));
+            std::string segment;
+            while(std::getline(inputString, segment, ' ')){
+                
+                if(segment != " "){
+                    viewOrigin.push_back(stod(segment));
+            
+                }
             }
-            delete[] string;
-            // viewOrigin = Input::getInputs();
-            // inputCounter++;
+            
 
         }
         else if (input == "viewdir"){
-            std::string input;
             std::getline(inputFile, input);
-            float i,j,k;
-            const int length = input.length();
-            char* string = new char[length+1];
-            strcpy(string,input.c_str());
-            if (sscanf(string, " %f %f %f\r", &i, &j, &k) == 3) {
-                inputCounter++;
-                viewDir.push_back(i);
-                viewDir.push_back(j);
-                viewDir.push_back(k);
-            } else {
-                std::cout << "not found\n"; 
+            std::stringstream inputString(input.substr(1));
+            std::string segment;
+            while(std::getline(inputString, segment, ' ')){
+                
+                if(segment != " "){
+                    viewDir.push_back(stod(segment));
+            
+                }
             }
-            delete[] string;
-            // viewDir = Input::getInputs();
-            // inputCounter++;
 
         }
         else if (input == "hfov"){
@@ -77,84 +61,93 @@ Input::Input(std::string filename){
 
         }
         else if (input == "updir"){
-            std::string input;
             std::getline(inputFile, input);
-            float i,j,k;
-            const int length = input.length();
-            char* string = new char[length+1];
-            strcpy(string,input.c_str());
-            if (sscanf(string, " %f %f %f\r", &i, &j, &k) == 3) {
-                inputCounter++;
-                upDir.push_back(i);
-                upDir.push_back(j);
-                upDir.push_back(k);
-            } else {
-                std::cout << "not found\n"; 
+            std::stringstream inputString(input.substr(1));
+            std::string segment;
+            while(std::getline(inputString, segment, ' ')){
+                
+                if(segment != " "){
+                    upDir.push_back(stod(segment));
+            
+                }
             }
-            delete[] string;
-            // upDir = Input::getInputs();
-            // inputCounter++;
-
+            
         }
         
         else if (input == "bkgcolor"){
-            // std::cout << "bkgcolor: " << std::endl;
-            std::string input;
             std::getline(inputFile, input);
-            float i,j,k;
-            const int length = input.length();
-            char* string = new char[length+1];
-            strcpy(string,input.c_str());
-            if (sscanf(string, " %f %f %f\r", &i, &j, &k) == 3) {
-                inputCounter++;
-                backgroundColor.push_back(i);
-                backgroundColor.push_back(j);
-                backgroundColor.push_back(k);
-            } else {
-                std::cout << "not found\n"; 
+            std::stringstream inputString(input.substr(1));
+            std::string segment;
+            while(std::getline(inputString, segment, ' ')){
+                
+                if(segment != " "){
+                    backgroundColor.push_back(stod(segment));
+            
+                }
             }
-            delete[] string;
-            // backgroundColor = Input::getInputs();
-            // inputCounter++;
 
         }
         else if (input == "mtlcolor"){
-            std::vector<double> materialColor;
-            materialColor = getInputs();
-            materials.push_back(Material(materialColor));
+            std::getline(inputFile, input);
+            std::stringstream inputString(input.substr(1));
+            std::string segment;
+            std::vector<double> inputNums;
+            while(std::getline(inputString, segment, ' ')){
+                
+                if(segment != " "){
+                    inputNums.push_back(stod(segment));
+            
+                }
+            }
+            materials.push_back(Material(inputNums));
         } else if (input == "sphere") {
 
             
             std::getline(inputFile, input);
-            std::stringstream sphere(input.substr(1));
+            std::stringstream inputString(input.substr(1));
             std::string segment;
-            std::vector<double> sphereNums;
-            while(std::getline(sphere, segment, ' ')){
+            std::vector<double> inputNums;
+            while(std::getline(inputString, segment, ' ')){
                 
                 if(segment != " "){
-                    sphereNums.push_back(stod(segment));
+                    inputNums.push_back(stod(segment));
             
                 }
             }
                 
-            spheres.push_back(Sphere(Ray(sphereNums[0],sphereNums[1],sphereNums[2]),sphereNums[3]));
+            spheres.push_back(Sphere(Ray(inputNums[0],inputNums[1],inputNums[2]),inputNums[3]));
         } 
         else if (input == "light"){
-            std::vector<double> lightInput = getInputs();
-            if (lightInput.size() > 5){
-                Ray position(lightInput[0],lightInput[1],lightInput[2]);
-                LightSource newLight(position, lightInput[3], lightInput[4]);
-                lights.push_back(newLight);
+            std::getline(inputFile, input);
+            std::stringstream inputString(input.substr(1));
+            std::string segment;
+            std::vector<double> lightInput;
+            while(std::getline(inputString, segment, ' ')){
+                
+                if(segment != " "){
+                    lightInput.push_back(stod(segment));
+            
+                }
             }
+            Ray position(lightInput[0],lightInput[1],lightInput[2]);
+            LightSource newLight(position, lightInput[3], lightInput[4]);
+            lights.push_back(newLight);
         } else if (input == "attlight"){
-            std::vector<double> lightInput = getInputs();
-            if (lightInput.size() > 5){
-                Ray position(lightInput[0],lightInput[1],lightInput[2]);
-                LightSource newLight(position, lightInput[3], lightInput[4],lightInput[5],lightInput[6],lightInput[7]);
-                lights.push_back(newLight);
+            std::getline(inputFile, input);
+            std::stringstream inputString(input.substr(1));
+            std::string segment;
+            std::vector<double> lightInput;
+            while(std::getline(inputString, segment, ' ')){
+                
+                if(segment != " "){
+                    lightInput.push_back(stod(segment));
+            
+                }
             }
+            Ray position(lightInput[0],lightInput[1],lightInput[2]);
+            LightSource newLight(position, lightInput[3], lightInput[4],lightInput[5],lightInput[6],lightInput[7]);
+            lights.push_back(newLight);
         } else if (input == "f") {
-            std::string input;
             std::getline(inputFile, input);
             int i,j,k;
             int a,b,c;
@@ -171,21 +164,43 @@ Input::Input(std::string filename){
                 inputFile >> input;
             }
         } else if (input == "v"){
-            Ray vertexInput = getInputs();
+            std::getline(inputFile, input);
+            std::stringstream inputString(input.substr(1));
+            std::string segment;
+            std::vector<double> inputNums;
+            while(std::getline(inputString, segment, ' ')){
+                
+                if(segment != " "){
+                    inputNums.push_back(stod(segment));
+            
+                }
+            }
+            Ray vertexInput(inputNums);
             vertices.push_back(vertexInput);
         } else if (input == "vn") {
-            Ray vertexNormalInput = getInputs();
+            std::getline(inputFile, input);
+            std::stringstream inputString(input.substr(1));
+            std::string segment;
+            std::vector<double> inputNums;
+            while(std::getline(inputString, segment, ' ')){
+                
+                if(segment != " "){
+                    inputNums.push_back(stod(segment));
+            
+                }
+            }
+            Ray vertexNormalInput(inputNums);
             vertexNormals.push_back(vertexNormalInput);
         }
         
-        // std::cout << input << "\n";
         
     }
 
     inputFile.close();
-    if (inputCounter == 6 && (spheres.size() > 0 || faces.size()>0) && lights.size() > 0){
-        isComplete = true;
-    } 
+    // if (inputCounter == 6 && (spheres.size() > 0 || faces.size()>0) && lights.size() > 0){
+    //     isComplete = true;
+    // } 
+    isComplete = true;
 }
 
 std::string Input::getFilename(){
@@ -248,38 +263,10 @@ void Input::printInput(){
     }
     for(int i=1;i<vertexNormals.size();i++){
         vertexNormals.at(i).print("vn: ");
-    }
+    }   
+    std::cout << "num faces: " << faces.size() << std::endl;
     
 }
-
-std::vector<double> Input::getInputs(){
-    
-    std::vector<double> output;
-    std::string input;
-    while (inputFile.peek() != '\n' && !inputFile.eof()){
-        int holdPosition = inputFile.tellg();
-        inputFile >> input;
-        // std::cout << "   " << input;
-        double doubleInput;
-        
-        try {
-            doubleInput = stod(input);
-            
-        } catch (const std::invalid_argument&) {
-            std::cout << "not a double\n";
-            inputFile.seekg(holdPosition);
-            break;
-        } catch (const std::out_of_range&) {
-            std::cout << "value out of range\n";
-            inputFile.seekg(holdPosition);
-            break;
-        }
-        output.push_back(doubleInput);
-    }
-    // std::cout << std::endl;
-    
-    return output;
-} 
 
 void Input::printVector(std::vector<double> input){
     for (int i=0;i<input.size();i++){
