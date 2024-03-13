@@ -26,6 +26,7 @@ class Input{
         bool getIsComplete(){return isComplete;}//checks if all necessary inputs have been given
         std::vector<Material> getMaterials(){return materials;}
         std::vector<Face> getFaces(){return faces;}
+        std::vector<Ray> getVertices(){return vertices;}
     private:
         std::vector<LightSource> lights;
         std::string filename;
@@ -36,7 +37,6 @@ class Input{
         std::vector<double> imageSize;
         std::vector<double> backgroundColor;
         std::vector<Sphere> spheres;
-        std::vector<double> getInputs();//read from file. reads until newline, then returns vector of inputs
         int fileCurrPos = 0;
         void printVector(std::vector<double> input);    
         bool isComplete = false;
