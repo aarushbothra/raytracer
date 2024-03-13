@@ -26,6 +26,7 @@ class Input{
         bool getIsComplete(){return isComplete;}//checks if all necessary inputs have been given
         std::vector<Material> getMaterials(){return materials;}
         std::vector<Face> getFaces(){return faces;}
+        std::vector<Ray> getVertices(){return vertices;}
     private:
         std::vector<LightSource> lights;
         std::string filename;

@@ -39,10 +39,11 @@ class RayCast{
         double dotProduct(Ray a, Ray b);
         double min(double minimum, double input);//checks if input is below minumum. if true, return minimum, otherwise return input
         double distance(Ray a, Ray b);
-        std::vector<double> checkFaceIntersection(Ray input);//returns a distance for each face in the path of ray input. if a face is not in the path, returns -1
+        std::vector<double> checkFaceIntersection(Ray input, Ray viewOrigin);//returns a distance for each face in the path of ray input. if a face is not in the path, returns -1
         std::vector<double> checkSphereIntersection(Ray input, Ray viewOrigin);
         std::vector<double> castLightSphere(Sphere sphereAtRay, Ray intersectPos, Material matAtRay, std::vector<LightSource> lights);
         std::vector<double> castLightFace(Face faceAtRay, Ray intersectPos, Material matAtRay, std::vector<LightSource> lights);
         std::vector<double> getPixelColor(Ray ray, Ray viewOrigin);//returns color at pixel
+        std::vector<double> matrixSolver(double a, double b, double e, double c, double d, double f);
 };
 
