@@ -80,7 +80,8 @@ std::vector<double> RayCast::getPixelColor(Ray input, Ray viewOrigin){
                 pixelColor = castLightSphere(interesectSphere, intersectionPoint, material, visibleLights);
             } else {
                 Face intersectFace = *rayIntersection.getIntersectFace();
-                pixelColor = castLightFace(intersectFace, intersectionPoint, material, visibleLights);
+                pixelColor = {0,1,1};
+                //pixelColor = castLightFace(intersectFace, intersectionPoint, material, visibleLights);
             }
         }
     }
@@ -329,11 +330,11 @@ Ray RayCast::crossProduct(Ray a, Ray b){
     // printRay(b);
     std::vector<double> output(3);
     // std::cout << "  cross product: ";
-    output[0] = (a[1]*b[2])-(a[2]*b[1]);
+    output[0] = (a[1]*b[2])-(b[1]*a[2]);
     // std::cout << output[0] << " ";
-    output[1] = -(a[2]*b[0])-(a[0]*b[2]);
+    output[1] = -((a[0]*b[2])-(b[0]*a[2]));
     // std::cout << output[1] << " ";
-    output[2] = (a[0]*b[1])-(a[1]*b[0]);
+    output[2] = (a[0]*b[1])-(b[0]*b[1]);
     // std::cout << output[2] << " " << std::endl;
     return Ray(output);
 }
