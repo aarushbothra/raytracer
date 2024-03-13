@@ -92,8 +92,6 @@ Intersection* RayCast::checkIntersections(Ray input, Ray viewOrigin){
     std::vector<Material> materials = inputFromUser->getMaterials();
     Intersection* output;
     std::vector<double> distance = checkSphereIntersection(input, viewOrigin);
-    // std::vector<double> distanceFaces = checkFaceIntersection(input);
-    // distance.insert(distance.end(),distanceFaces.begin(),distanceFaces.end());
 
     double least = -1;
     int leastIndex;
@@ -115,7 +113,6 @@ Intersection* RayCast::checkIntersections(Ray input, Ray viewOrigin){
         if (leastIndex > inputFromUser->getSpheres().size()-1){
             return new Intersection( &intersectPoint, &materials[materials.size()-1],&inputFromUser->getFaces()[leastIndex - inputFromUser->getSpheres().size()-1]);
         } else {
-            // printVector(materials[leastIndex].getMaterial(), "checkIntersections material: ");
             std::vector<double> outMaterial = materials[leastIndex].getMaterial();
             Material* outputMaterial = new Material(outMaterial);
             Sphere* outputSphere = new Sphere(inputFromUser->getSpheres()[leastIndex]);
@@ -231,36 +228,6 @@ std::vector<LightSource> RayCast::shadeRay(Ray intersectPos){
 
     return visibleLights;
 
-
-    // for (auto light:lights){
-    //     Ray lVec;
-    //     if(light.isDirectional()){
-    //         lVec = (normalizeRay(light.getPosition()*-1));
-    //     } else {
-    //         lVec = (normalizeRay(light.getPosition()-intersectPos));
-    //     }
-    //     std::vector<double> nearestSphere = checkIntersections(lVec, intersectPos);
-    //     if (nearestSphere.size()==1){
-    //         if (nearestSphere[0] < distance(light.getPosition(), intersectPos) && !light.isDirectional()){
-    //             continue;
-    //         } else if (light.isDirectional()){
-    //             continue;
-    //         }
-    //     } 
-
-    //     Ray nVec = (normalizeRay((intersectPos-sphereAtRay.getLocation())*(1/sphereAtRay.getRadius())));
-    //     Ray vVec = normalizeRay(inputFromUser->getViewOrigin()-intersectPos);
-    //     Ray hVec = normalizeRay((lVec+vVec));
-        
-    //     colorSum = colorSum + (((matAtRay.KdOdLam*min(0,dotProduct(nVec,lVec))) + (matAtRay.KsOsLam*pow(min(0,dotProduct(nVec,hVec)),matAtRay.n)))*light.getIntensity()*light.getAttenFactor(distance(light.getPosition(),intersectPos)));
-    // }
-
-    // colorSum = colorSum + matAtRay.KaOdLam;
-    // output[0] = colorSum[0];
-    // output[1] = colorSum[1];
-    // output[2] = colorSum[2];
-
-    // return output;
 }
 
 Ray RayCast::normalizeRay(Ray input){
