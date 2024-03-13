@@ -4,6 +4,9 @@
 #include <iostream>
 #include "Sphere.h"
 #include "LightSource.h"
+#include "Face.h"
+#include "Material.h"
+#include <sstream>
 #pragma once
 
 
@@ -21,6 +24,8 @@ class Input{
         void printInput();
         std::string getFilename();
         bool getIsComplete(){return isComplete;}//checks if all necessary inputs have been given
+        std::vector<Material> getMaterials(){return materials;}
+        std::vector<Face> getFaces(){return faces;}
     private:
         std::vector<LightSource> lights;
         std::string filename;
@@ -35,5 +40,9 @@ class Input{
         int fileCurrPos = 0;
         void printVector(std::vector<double> input);    
         bool isComplete = false;
+        std::vector<Ray> vertices;
+        std::vector<Ray> vertexNormals;
+        std::vector<Face> faces;
+        std::vector<Material> materials;
 
 };

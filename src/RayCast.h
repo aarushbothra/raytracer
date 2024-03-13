@@ -5,6 +5,7 @@
 #include "Output.h"
 #include "Ray.h"
 #include <math.h>
+#include "Intersection.h"
 
 class RayCast{
     public:
@@ -16,7 +17,7 @@ class RayCast{
         Ray v;
         Ray normalizeRay(Ray input);
         void printVector(std::vector<double> input, std::string message);
-        std::vector<double> checkSpheres(Ray ray, Ray viewOrigin);//checks if ray intersects with sphere
+        Intersection* checkIntersections(Ray ray, Ray viewOrigin);//returns closest intersection point
         Ray crossProduct(Ray a, Ray b);
         double viewWindowWidth;
         double viewWindowHeight;
@@ -34,9 +35,14 @@ class RayCast{
         void calcViewingWindow();//calculate vectors that define viewing window, as well as its size
         Ray testRay; 
         Output* userImage;
-        std::vector<double> shadeRay(Sphere sphereAtRay, Ray intersectPos);//calculates shadows from direct light interaction as well as objects
+        std::vector<LightSource> shadeRay(Ray intersectPos);//checks if pixel is in shadow
         double dotProduct(Ray a, Ray b);
         double min(double minimum, double input);//checks if input is below minumum. if true, return minimum, otherwise return input
         double distance(Ray a, Ray b);
+        std::vector<double> checkFaceIntersection(Ray input);//returns a distance for each face in the path of ray input. if a face is not in the path, returns -1
+        std::vector<double> checkSphereIntersection(Ray input, Ray viewOrigin);
+        std::vector<double> castLightSphere(Sphere sphereAtRay, Ray intersectPos, Material matAtRay, std::vector<LightSource> lights);
+        std::vector<double> castLightFace(Face faceAtRay, Ray intersectPos, Material matAtRay, std::vector<LightSource> lights);
+        std::vector<double> getPixelColor(Ray ray, Ray viewOrigin);//returns color at pixel
 };
 
