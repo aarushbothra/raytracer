@@ -1,4 +1,5 @@
 #include "Ray.h"
+#pragma once
 
 class Material{
     public:

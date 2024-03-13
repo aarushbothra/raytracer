@@ -1,5 +1,6 @@
 #include <vector>
 #include "Ray.h"
+#pragma once
 
 class Sphere{
     public:
