@@ -164,8 +164,8 @@ std::vector<double> RayCast::checkFaceIntersection(Ray ray, Ray viewOrigin){
 
         Ray p = x0 + xd*t;
 
-        if(!checkPointOnFace(viewOrigin, e1, e2, p0, error)){//if viewOrigin is on current face
-            if (checkPointOnFace(p, e1, e2, p0, error)){
+        if(checkPointOnFace(viewOrigin, e1, e2, p0, error).empty()){//if viewOrigin is on current face
+            if (!checkPointOnFace(p, e1, e2, p0, error).empty()){
                 distances.push_back(distance(viewOrigin, p));
             } else {
                 distances.push_back(-1);
@@ -184,7 +184,7 @@ std::vector<double> RayCast::checkFaceIntersection(Ray ray, Ray viewOrigin){
     return distances;
 }
 
-bool RayCast::checkPointOnFace(Ray p, Ray e1, Ray e2, Ray p0, double error){
+std::vector<double> RayCast::checkPointOnFace(Ray p, Ray e1, Ray e2, Ray p0, double error){
     Ray ep = p - p0;
     double d11 = dotProduct(e1,e1);
     double d22 = dotProduct(e2,e2);
@@ -194,14 +194,14 @@ bool RayCast::checkPointOnFace(Ray p, Ray e1, Ray e2, Ray p0, double error){
 
     std::vector<double> baryCoords = matrixSolver(d11,d12,d1p,d12,d22,d2p);
     baryCoords.push_back(1 - (baryCoords[0]+baryCoords[1]));
-    bool inFace = true;
+    
     for (auto coord: baryCoords){
         if (coord > (1-error) || coord < error){
-            inFace = false;
-            return inFace;
+            std::vector<double> empty;
+            return empty;
         }
     }
-    return inFace;
+    return baryCoords;
 }
 
 std::vector<double> RayCast::checkSphereIntersection(Ray input, Ray viewOrigin){
@@ -289,6 +289,10 @@ std::vector<double> RayCast::castLightFace(Face faceAtRay, Ray intersectPos, Mat
         Ray e1 = p1-p0;
         Ray e2 = p2-p0;
         Ray nVec = normalizeRay(crossProduct(e1,e2));
+        if (faceAtRay.hasNormals()){
+            std::vector<double> baryCoords = checkPointOnFace(intersectPos, e1, e2, p0, 1e-10);
+            nVec = normalizeRay(faceAtRay.getNormal(0)*baryCoords[2] + faceAtRay.getNormal(1)*baryCoords[0] + faceAtRay.getNormal(2)*baryCoords[1]);
+        }
         Ray vVec = normalizeRay(inputFromUser->getViewOrigin()-intersectPos);
         Ray hVec = normalizeRay((lVec+vVec));
         
