@@ -8,8 +8,8 @@ Texture::Texture(std::string filename_){
 
 std::vector<double> Texture::getPixel(double i, double j){
     std::vector<double> output;
-    int u = i*width;
-    int v = j*height;
+    int u = i*(width-1);
+    int v = j*(height-1);
     output.push_back(imageArr[v*width+u][0]);
     output.push_back(imageArr[v*width+u][1]);
     output.push_back(imageArr[v*width+u][2]);

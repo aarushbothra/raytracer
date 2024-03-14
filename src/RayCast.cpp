@@ -249,6 +249,21 @@ std::vector<double> RayCast::checkSphereIntersection(Ray input, Ray viewOrigin){
 std::vector<double> RayCast::castLightSphere(Sphere sphereAtRay, Ray intersectPos, Material matAtRay, std::vector<LightSource> lights){
     std::vector<double> output = inputFromUser->getBackgroundColor();
     Ray colorSum;
+    Ray nVec = (normalizeRay((intersectPos-sphereAtRay.getLocation())*(1/sphereAtRay.getRadius())));
+
+    if (sphereAtRay.hasTexture()){
+        double phi = acos((intersectPos[2]-sphereAtRay.getLocation()[2])/sphereAtRay.getRadius());
+        double theta = atan2((intersectPos[1] - sphereAtRay.getLocation()[1]), (intersectPos[0]-sphereAtRay.getLocation()[0]));
+        double v = phi/M_PI;
+        if (theta < 0){
+            theta = theta + (2*M_PI);
+        } 
+        double u = theta/(2*M_PI);
+        // std::cout << "u: " << u << " v: " << v << std::endl;
+        // printVector(sphereAtRay.getTexture()->getPixel(u,v), "  texture color: ");
+        matAtRay.calcTextureCoefficients(Ray(sphereAtRay.getTexture()->getPixel(u,v))*(1.0/255.0));
+    } 
+
     for (auto light:lights){
         Ray lVec;
         if(light.isDirectional()){
@@ -257,21 +272,9 @@ std::vector<double> RayCast::castLightSphere(Sphere sphereAtRay, Ray intersectPo
             lVec = (normalizeRay(light.getPosition()-intersectPos));
         }
         
-        Ray nVec = (normalizeRay((intersectPos-sphereAtRay.getLocation())*(1/sphereAtRay.getRadius())));
         Ray vVec = normalizeRay(inputFromUser->getViewOrigin()-intersectPos);
         Ray hVec = normalizeRay((lVec+vVec));
-        if (sphereAtRay.hasTexture()){
-            double phi = acos((intersectPos[2]-sphereAtRay.getLocation()[2])/sphereAtRay.getRadius());
-            double theta = atan2((intersectPos[1] - sphereAtRay.getLocation()[1]), (intersectPos[0]-sphereAtRay.getLocation()[0]));
-            double v = phi/M_PI;
-            if (theta < 0){
-                theta = theta + (2*M_PI);
-            } 
-            double u = theta/(2*M_PI);
-            // std::cout << "u: " << u << " v: " << v << std::endl;
-            // printVector(sphereAtRay.getTexture()->getPixel(u,v), "  texture color: ");
-            matAtRay.calcTextureCoefficients(Ray(sphereAtRay.getTexture()->getPixel(u,v))*(1.0/255.0));
-        } 
+        
             
         colorSum = colorSum + (((matAtRay.KdOdLam*min(0,dotProduct(nVec,lVec))) + (matAtRay.KsOsLam*pow(min(0,dotProduct(nVec,hVec)),matAtRay.n)))*light.getIntensity()*light.getAttenFactor(distance(light.getPosition(),intersectPos)));
         
@@ -286,6 +289,27 @@ std::vector<double> RayCast::castLightSphere(Sphere sphereAtRay, Ray intersectPo
 }
 
 std::vector<double> RayCast::castLightFace(Face faceAtRay, Ray intersectPos, Material matAtRay, std::vector<LightSource> lights){
+    
+    Ray p0 = faceAtRay.getVertex(0);
+    Ray p1 = faceAtRay.getVertex(1);
+    Ray p2 = faceAtRay.getVertex(2);
+    Ray e1 = p1-p0;
+    Ray e2 = p2-p0;
+    Ray nVec = normalizeRay(crossProduct(e1,e2));
+
+    if (faceAtRay.hasNormals() || faceAtRay.hasTexture()){
+        std::vector<double> baryCoords = checkPointOnFace(intersectPos, e1, e2, p0, 1e-10);
+        if (faceAtRay.hasNormals()){
+            nVec = normalizeRay(faceAtRay.getNormal(0)*baryCoords[2] + faceAtRay.getNormal(1)*baryCoords[0] + faceAtRay.getNormal(2)*baryCoords[1]);
+        }
+        if (faceAtRay.hasTexture()){
+            std::vector<double*> textureCoords = {faceAtRay.getTextureCoords(0), faceAtRay.getTextureCoords(1), faceAtRay.getTextureCoords(2)};
+            double u = baryCoords[2]*textureCoords[0][0] + baryCoords[0]*textureCoords[1][0] + baryCoords[1]*textureCoords[2][0];
+            double v = baryCoords[2]*textureCoords[0][1] + baryCoords[0]*textureCoords[1][1] + baryCoords[1]*textureCoords[2][1];
+            matAtRay.calcTextureCoefficients(Ray(faceAtRay.getTexture()->getPixel(u,v))*(1.0/255.0));
+        }  
+    }
+    
     std::vector<double> output = inputFromUser->getBackgroundColor();
     Ray colorSum;
     for (auto light:lights){
@@ -296,19 +320,9 @@ std::vector<double> RayCast::castLightFace(Face faceAtRay, Ray intersectPos, Mat
             lVec = (normalizeRay(light.getPosition()-intersectPos));
         }
         
-        Ray p0 = faceAtRay.getVertex(0);
-        Ray p1 = faceAtRay.getVertex(1);
-        Ray p2 = faceAtRay.getVertex(2);
-        Ray e1 = p1-p0;
-        Ray e2 = p2-p0;
-        Ray nVec = normalizeRay(crossProduct(e1,e2));
-        if (faceAtRay.hasNormals()){
-            std::vector<double> baryCoords = checkPointOnFace(intersectPos, e1, e2, p0, 1e-10);
-            nVec = normalizeRay(faceAtRay.getNormal(0)*baryCoords[2] + faceAtRay.getNormal(1)*baryCoords[0] + faceAtRay.getNormal(2)*baryCoords[1]);
-        }
         Ray vVec = normalizeRay(inputFromUser->getViewOrigin()-intersectPos);
         Ray hVec = normalizeRay((lVec+vVec));
-        
+
         colorSum = colorSum + (((matAtRay.KdOdLam*min(0,dotProduct(nVec,lVec))) + (matAtRay.KsOsLam*pow(min(0,dotProduct(nVec,hVec)),matAtRay.n)))*light.getIntensity()*light.getAttenFactor(distance(light.getPosition(),intersectPos)));
     }
 
