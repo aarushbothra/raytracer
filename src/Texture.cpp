@@ -19,6 +19,7 @@ std::vector<double> Texture::getPixel(double i, double j){
 }
 
 void Texture::ingestTexture(){
+    std::cout << "ingesting texture " << filename << "\n";
     std::fstream file(filename);
     std::string input;
 
