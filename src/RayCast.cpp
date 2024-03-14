@@ -52,10 +52,12 @@ void RayCast::calcViewRays(){
     // std::cout << "calculating rays" << std::endl;
     for(int j=0;j<height;j++){
         for (int i=0;i<width;i++){
-            // if (i == 258 && j == 244){
-            //     int g = 9;
-            // }
-            std::vector<double> pixelColor = getPixelColor(normalizeRay(ul + (deltaV*(j)) + (deltaH*(i))), inputFromUser->getViewOrigin());
+            if (i == 244 && j == 109){
+                int g = 9;
+            }
+            Ray rayDir = normalizeRay(ul + (deltaV*(j)) + (deltaH*(i)));
+            Ray viewOrigin = inputFromUser->getViewOrigin();
+            std::vector<double> pixelColor = getPixelColor( rayDir, viewOrigin);
             userImage->modPixel(pixelColor[0],pixelColor[1],pixelColor[2],i,j);
 
         }
@@ -162,7 +164,7 @@ std::vector<double> RayCast::checkFaceIntersection(Ray ray, Ray viewOrigin){
 
         Ray p = x0 + xd*t;
 
-        if(!checkPointOnFace(viewOrigin, e1, e2, p0, error)){
+        if(!checkPointOnFace(viewOrigin, e1, e2, p0, error)){//if viewOrigin is on current face
             if (checkPointOnFace(p, e1, e2, p0, error)){
                 distances.push_back(distance(viewOrigin, p));
             } else {
@@ -196,6 +198,7 @@ bool RayCast::checkPointOnFace(Ray p, Ray e1, Ray e2, Ray p0, double error){
     for (auto coord: baryCoords){
         if (coord > (1-error) || coord < error){
             inFace = false;
+            return inFace;
         }
     }
     return inFace;
@@ -348,13 +351,10 @@ Ray RayCast::crossProduct(Ray a, Ray b){
     // std::cout << "  b: ";
     // printRay(b);
     std::vector<double> output(3);
-    // std::cout << "  cross product: ";
-    output[0] = (a[1]*b[2])-(b[1]*a[2]);
-    // std::cout << output[0] << " ";
-    output[1] = -((a[0]*b[2])-(b[0]*a[2]));
-    // std::cout << output[1] << " ";
-    output[2] = (a[0]*b[1])-(b[0]*b[1]);
-    // std::cout << output[2] << " " << std::endl;
+    output[0] = a[1] * b[2] - a[2] * b[1];
+    output[1] = -(a[0] * b[2] - a[2] * b[0]);
+    output[2] = a[0] * b[1] - a[1] * b[0];
+
     return Ray(output);
 }
 
