@@ -33,10 +33,10 @@ Sphere.o: src/Sphere.h src/Sphere.cpp
 .PHONY: all clean
 
 deletePrevious:
-	rm -f raytracer1a
+	rm -f raytracer*
 
 postClean:
 	rm -f *.o
 
 clean:
-	rm -f *.o raytracer1a *.ppm
+	rm -f *.o raytracer* *.ppm
