@@ -37,22 +37,25 @@ void Texture::ingestTexture(){
 
     int i = 0;
     int j = 0;
+    int* loopSegArr = new int[3];
+    int x;
     while (!file.eof() && file.is_open()){
         
 
         std::getline(file, input);
-        std::stringstream inputString1(input);
-        std::string segment1;
-        std::vector<int> segments1;
-        while(std::getline(inputString1, segment1, ' ')){
+        std::stringstream loopInput(input);
+        std::string loopSegment;
+        // std::vector<int> segments1;
+        x = 0;
+        while(std::getline(loopInput, loopSegment, ' ')){
             // if (i == 0 && j == 1){
             //     int b = 8;
             // }
-            if(segment1 == ""){
+            if(loopSegment == ""){
                 imageArr[j*width+i] = new double[3];
-                imageArr[j*width+i][0] = segments1[0];
-                imageArr[j*width+i][1] = segments1[1];
-                imageArr[j*width+i][2] = segments1[2];
+                imageArr[j*width+i][0] = loopSegArr[0];
+                imageArr[j*width+i][1] = loopSegArr[1];
+                imageArr[j*width+i][2] = loopSegArr[2];
 
                 i++;
                 if (i==width){
@@ -62,13 +65,14 @@ void Texture::ingestTexture(){
                 if (j==height){
                     break;
                 }
-                segments1.clear();
-            } else if(segment1 == "\r"){
+                x=0;
+            } else if(loopSegment == "\r"){
                 break;
             } else {
                 // std::cout << "segment1: " << segment1 << std::endl;
-                segments1.push_back(stoi(segment1));
-                
+
+                loopSegArr[x] = stoi(loopSegment);
+                x++;
             }
             // std::cout << "  i: " << i << " j: " << j << std::endl;
         }
