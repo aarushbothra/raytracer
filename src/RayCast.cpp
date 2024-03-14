@@ -57,7 +57,7 @@ void RayCast::calcViewRays(){
             Ray viewWindowLocation = ul + (deltaV*(j)) + (deltaH*(i));
             Ray viewOrigin = inputFromUser->getViewOrigin();
             Ray rayDir = normalizeRay(viewWindowLocation - viewOrigin);
-            std::vector<double> pixelColor = getPixelColor( rayDir, viewOrigin);
+            std::vector<double> pixelColor = getPixelColor(rayDir, viewOrigin);
             userImage->modPixel(pixelColor[0],pixelColor[1],pixelColor[2],i,j);
 
         }

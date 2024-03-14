@@ -45,10 +45,10 @@ Texture.o: src/Texture.h src/Texture.cpp
 .PHONY: all clean
 
 deletePrevious:
-	rm -f $(OUTFILE)
+	rm -f raytracer1*
 
 postClean:
 	rm -f *.o
 
 clean:
-	rm -f *.o $(OUTFILE) *.ppm
+	rm -f *.o raytracer1* *.ppm
