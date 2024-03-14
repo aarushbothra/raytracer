@@ -12,7 +12,7 @@ RayCast::RayCast(Input userInput, Output image){
 }
 
 void RayCast::calcViewingWindow(){
-    w = normalizeRay(inputFromUser->getViewDir())*-1;
+    w = normalizeRay(Ray(inputFromUser->getViewDir())*-1);
     // w.print("w: ");
     // printVector(inputFromUser->getUpDir(), "upDir: ");
     u = normalizeRay(crossProduct(inputFromUser->getViewDir(), Ray(inputFromUser->getUpDir())));
@@ -22,24 +22,23 @@ void RayCast::calcViewingWindow(){
 
     viewWindowWidth = 2*viewingDistance*tan(degreesToRadians(0.5*inputFromUser->getHFOV()));
     // std::cout << "view window width: " << viewWindowWidth << std::endl;
-    aspectRatio = inputFromUser->getImageSize()[0]/inputFromUser->getImageSize()[1];
+    // aspectRatio = inputFromUser->getImageSize()[0]/inputFromUser->getImageSize()[1];
     // std::cout << "aspectRatio: " << aspectRatio << std::endl;
-    viewWindowHeight = viewWindowWidth*(1/aspectRatio);
+    viewWindowHeight = viewWindowWidth*(inputFromUser->getImageSize()[1]/inputFromUser->getImageSize()[0]);
     // std::cout << "view window height: " << viewWindowHeight << std::endl;
 }
 
 void RayCast::calcCorners(){
     Ray viewOrigin(inputFromUser->getViewOrigin());
-    Ray viewDir(inputFromUser->getViewDir());
-    viewDir = normalizeRay(viewDir);
-    ll = viewOrigin + (viewDir*viewingDistance) - (u*(viewWindowWidth/2)) - (v*(viewWindowHeight/2));
-    // ll.print("ll: ");
-    ul = viewOrigin + (viewDir*viewingDistance) - (u*(viewWindowWidth/2)) + (v*(viewWindowHeight/2));
-    // ul.print("ul: ");
-    lr = viewOrigin + (viewDir*viewingDistance) + (u*(viewWindowWidth/2)) - (v*(viewWindowHeight/2));
-    // lr.print("lr: ");
-    ur = viewOrigin + (viewDir*viewingDistance) + (u*(viewWindowWidth/2)) + (v*(viewWindowHeight/2));
-    // ur.print("ur: ");
+    Ray A = viewOrigin;
+    Ray B = viewingDistance*normalizeRay(inputFromUser->getViewDir());
+    Ray C = u*(viewWindowWidth/2);
+    Ray D = v*(viewWindowHeight/2);
+
+    ul = A + B - C + D;
+    ur = A + B + C + D;
+    ll = A + B - C - D;
+    lr = A + B + C - D;
 }
 
 void RayCast::calcViewRays(){
@@ -47,7 +46,7 @@ void RayCast::calcViewRays(){
     double height = inputFromUser->getImageSize()[1];
     Ray deltaH =(ur-ul)*(1/(width-1));
     // deltaH.print("deltaH: ");
-    Ray deltaV =(ll-(ul)) * (1/(height-1));
+    Ray deltaV =(ll-ul) * (1/(height-1));
     // deltaV.print("deltaV: ");
     // std::cout << "calculating rays" << std::endl;
     for(int j=0;j<height;j++){
@@ -55,8 +54,9 @@ void RayCast::calcViewRays(){
             if (i == width/2 && j == height/2){
                 int g = 9;
             }
-            Ray rayDir = normalizeRay(ul + (deltaV*(j)) + (deltaH*(i)));
+            Ray viewWindowLocation = ul + (deltaV*(j)) + (deltaH*(i));
             Ray viewOrigin = inputFromUser->getViewOrigin();
+            Ray rayDir = normalizeRay(viewWindowLocation - viewOrigin);
             std::vector<double> pixelColor = getPixelColor( rayDir, viewOrigin);
             userImage->modPixel(pixelColor[0],pixelColor[1],pixelColor[2],i,j);
 
