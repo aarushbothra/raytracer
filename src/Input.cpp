@@ -25,7 +25,7 @@ Input::Input(std::string filename){
             
                 }
             }
-
+            inputCounter++;
         }
         else if (input == "eye"){
             std::getline(inputFile, input);
@@ -38,7 +38,7 @@ Input::Input(std::string filename){
             
                 }
             }
-            
+            inputCounter++;
 
         }
         else if (input == "viewdir"){
@@ -52,13 +52,12 @@ Input::Input(std::string filename){
             
                 }
             }
-
+            inputCounter++;
         }
         else if (input == "hfov"){
             inputFile>>input;
             hFOV = stoi(input);
             inputCounter++;
-
         }
         else if (input == "updir"){
             std::getline(inputFile, input);
@@ -71,7 +70,7 @@ Input::Input(std::string filename){
             
                 }
             }
-            
+            inputCounter++;
         }
         
         else if (input == "bkgcolor"){
@@ -85,7 +84,7 @@ Input::Input(std::string filename){
             
                 }
             }
-
+            inputCounter++;
         }
         else if (input == "mtlcolor"){
             std::getline(inputFile, input);
@@ -197,10 +196,9 @@ Input::Input(std::string filename){
     }
 
     inputFile.close();
-    // if (inputCounter == 6 && (spheres.size() > 0 || faces.size()>0) && lights.size() > 0){
-    //     isComplete = true;
-    // } 
-    isComplete = true;
+    if (inputCounter == 6 && (spheres.size() > 0 || faces.size()>0) && lights.size() > 0 && materials.size()>0){
+        isComplete = true;
+    } 
 }
 
 std::string Input::getFilename(){
