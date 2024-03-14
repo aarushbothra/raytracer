@@ -44,5 +44,6 @@ class Input{
         std::vector<Ray> vertexNormals;
         std::vector<Face> faces;
         std::vector<Material> materials;
+        std::vector<Texture*> textures;
 
 };
