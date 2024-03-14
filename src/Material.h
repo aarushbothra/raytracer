@@ -9,6 +9,7 @@ class Material{
         Ray KdOdLam;
         Ray KsOsLam;
         double n;
+        void calcTextureCoefficients(Ray Od);
     private:
         std::vector<double> material;
         void calcPhongCoefficients();

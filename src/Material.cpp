@@ -19,3 +19,15 @@ void Material::calcPhongCoefficients(){
     KdOdLam = Od*Kd;
     KsOsLam = Os*Ks;
 }
+
+void Material::calcTextureCoefficients(Ray Od){
+    Ray Os(material[3], material[4], material[5]);
+    double Ka = material[6];
+    double Kd = material[7];
+    double Ks = material[8];
+
+    KaOdLam = Od*Ka;
+    KdOdLam = Od*Kd;
+    KsOsLam = Os*Ks;
+}
+

@@ -7,7 +7,7 @@
 class Texture{
     public:
         Texture(std::string filename_);
-        std::vector<double> getPixel(int i, int j);
+        std::vector<double> getPixel(double i, double j);
         int getWidth(){return width;}
         int getHeight(){return height;}
         std::string getFilename(){return filename;}

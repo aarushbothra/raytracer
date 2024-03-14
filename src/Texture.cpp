@@ -6,11 +6,13 @@ Texture::Texture(std::string filename_){
     int i = 3;
 }
 
-std::vector<double> Texture::getPixel(int i, int j){
+std::vector<double> Texture::getPixel(double i, double j){
     std::vector<double> output;
-    output.push_back(imageArr[j*width+i][0]);
-    output.push_back(imageArr[j*width+i][1]);
-    output.push_back(imageArr[j*width+i][2]);
+    int u = i*width;
+    int v = j*height;
+    output.push_back(imageArr[v*width+u][0]);
+    output.push_back(imageArr[v*width+u][1]);
+    output.push_back(imageArr[v*width+u][2]);
 
     return output;
 
@@ -67,7 +69,7 @@ void Texture::ingestTexture(){
                 }
                 x=0;
             } else if(loopSegment == "\r"){
-                break;
+                // break;
             } else {
                 // std::cout << "segment1: " << segment1 << std::endl;
 

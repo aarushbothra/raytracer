@@ -260,8 +260,21 @@ std::vector<double> RayCast::castLightSphere(Sphere sphereAtRay, Ray intersectPo
         Ray nVec = (normalizeRay((intersectPos-sphereAtRay.getLocation())*(1/sphereAtRay.getRadius())));
         Ray vVec = normalizeRay(inputFromUser->getViewOrigin()-intersectPos);
         Ray hVec = normalizeRay((lVec+vVec));
-        
+        if (sphereAtRay.hasTexture()){
+            double phi = acos((intersectPos[2]-sphereAtRay.getLocation()[2])/sphereAtRay.getRadius());
+            double theta = atan2((intersectPos[1] - sphereAtRay.getLocation()[1]), (intersectPos[0]-sphereAtRay.getLocation()[0]));
+            double v = phi/M_PI;
+            if (theta < 0){
+                theta = theta + (2*M_PI);
+            } 
+            double u = theta/(2*M_PI);
+            // std::cout << "u: " << u << " v: " << v << std::endl;
+            // printVector(sphereAtRay.getTexture()->getPixel(u,v), "  texture color: ");
+            matAtRay.calcTextureCoefficients(Ray(sphereAtRay.getTexture()->getPixel(u,v))*(1.0/255.0));
+        } 
+            
         colorSum = colorSum + (((matAtRay.KdOdLam*min(0,dotProduct(nVec,lVec))) + (matAtRay.KsOsLam*pow(min(0,dotProduct(nVec,hVec)),matAtRay.n)))*light.getIntensity()*light.getAttenFactor(distance(light.getPosition(),intersectPos)));
+        
     }
 
     colorSum = colorSum + matAtRay.KaOdLam;
