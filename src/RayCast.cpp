@@ -52,7 +52,7 @@ void RayCast::calcViewRays(){
     // std::cout << "calculating rays" << std::endl;
     for(int j=0;j<height;j++){
         for (int i=0;i<width;i++){
-            if (i == 244 && j == 109){
+            if (i == width/2 && j == height/2){
                 int g = 9;
             }
             Ray rayDir = normalizeRay(ul + (deltaV*(j)) + (deltaH*(i)));
