@@ -4,6 +4,14 @@ Sphere::Sphere(Ray newL, double r){
     location = newL;
     radius = r;
 }
+
+Sphere::Sphere(Ray newL, double r, Texture* texture_){
+    location = newL;
+    radius = r;
+    texture = texture_;
+    textured = true;
+}
+
 Ray Sphere::getLocation(){
     return location;
 }
