@@ -45,5 +45,6 @@ class RayCast{
         std::vector<double> castLightFace(Face faceAtRay, Ray intersectPos, Material matAtRay, std::vector<LightSource> lights);
         std::vector<double> getPixelColor(Ray ray, Ray viewOrigin);//returns color at pixel
         std::vector<double> matrixSolver(double a, double b, double e, double c, double d, double f);
+        bool checkPointOnFace(Ray p, Ray e1, Ray e2, Ray p0, double error);
 };
 

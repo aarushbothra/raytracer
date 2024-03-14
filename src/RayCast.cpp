@@ -162,25 +162,16 @@ std::vector<double> RayCast::checkFaceIntersection(Ray ray, Ray viewOrigin){
 
         Ray p = x0 + xd*t;
 
-        Ray ep = p - p0;
-        double d11 = dotProduct(e1,e1);
-        double d22 = dotProduct(e2,e2);
-        double d12 = dotProduct(e1,e2);
-        double d1p = dotProduct(e1,ep);
-        double d2p = dotProduct(e2,ep);
-
-        std::vector<double> baryCoords = matrixSolver(d11,d12,d1p,d12,d22,d2p);
-        baryCoords.push_back(1 - (baryCoords[0]+baryCoords[1]));
-        bool inFace = true;
-        for (auto coord: baryCoords){
-            if (coord > (1-error) || coord < error){
+        if(!checkPointOnFace(viewOrigin, e1, e2, p0, error)){
+            if (checkPointOnFace(p, e1, e2, p0, error)){
+                distances.push_back(distance(viewOrigin, p));
+            } else {
                 distances.push_back(-1);
-                inFace = false;
             }
+        } else {
+            distances.push_back(-1);
         }
-        if (inFace){
-            distances.push_back(distance(viewOrigin, p));
-        }
+        
         // if(baryCoords[0] < error || baryCoords[1] < error || baryCoords [0] > 1 || baryCoords[1] > 1){
         //     distances.push_back(-1);
         // } else {
@@ -189,6 +180,25 @@ std::vector<double> RayCast::checkFaceIntersection(Ray ray, Ray viewOrigin){
 
     }
     return distances;
+}
+
+bool RayCast::checkPointOnFace(Ray p, Ray e1, Ray e2, Ray p0, double error){
+    Ray ep = p - p0;
+    double d11 = dotProduct(e1,e1);
+    double d22 = dotProduct(e2,e2);
+    double d12 = dotProduct(e1,e2);
+    double d1p = dotProduct(e1,ep);
+    double d2p = dotProduct(e2,ep);
+
+    std::vector<double> baryCoords = matrixSolver(d11,d12,d1p,d12,d22,d2p);
+    baryCoords.push_back(1 - (baryCoords[0]+baryCoords[1]));
+    bool inFace = true;
+    for (auto coord: baryCoords){
+        if (coord > (1-error) || coord < error){
+            inFace = false;
+        }
+    }
+    return inFace;
 }
 
 std::vector<double> RayCast::checkSphereIntersection(Ray input, Ray viewOrigin){
