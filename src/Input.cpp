@@ -113,8 +113,12 @@ Input::Input(std::string filename){
             
                 }
             }
-                
-            spheres.push_back(Sphere(Ray(inputNums[0],inputNums[1],inputNums[2]),inputNums[3]));
+            if (textures.empty()){
+                spheres.push_back(Sphere(Ray(inputNums[0],inputNums[1],inputNums[2]),inputNums[3]));
+            } else {
+                spheres.push_back(Sphere(Ray(inputNums[0],inputNums[1],inputNums[2]),inputNums[3], textures.at(textures.size()-1)));
+            }
+            
         } 
         else if (input == "light"){
             std::getline(inputFile, input);
@@ -190,6 +194,9 @@ Input::Input(std::string filename){
             }
             Ray vertexNormalInput(inputNums);
             vertexNormals.push_back(vertexNormalInput);
+        } else if (input == "texture"){
+            std::getline(inputFile, input);
+            textures.push_back(new Texture("texture/" + input.substr(1)));
         }
         
         
@@ -251,7 +258,13 @@ void Input::printInput(){
         printVector(materials.at(i).getMaterial());
     }
     for (int i=0;i<spheres.size();i++){
-        spheres.at(i).getLocation().print("sphere ");
+        if (spheres[i].hasTexture()){
+            spheres.at(i).getLocation().print("sphere ");
+            std::cout << "  texture " << spheres[i].getTexture()->getFilename() << std::endl;
+        } else {
+            spheres.at(i).getLocation().print("sphere ");
+        }
+        
     }
     for (int i=0;i<lights.size();i++){
         lights.at(i).print("light ");
@@ -263,6 +276,9 @@ void Input::printInput(){
         vertexNormals.at(i).print("vn: ");
     }   
     std::cout << "num faces: " << faces.size() << std::endl;
+    for (auto texture:textures){
+        std::cout << "texture " << texture->getFilename() << std::endl;
+    }
     
 }
 
