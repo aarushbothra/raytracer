@@ -21,7 +21,7 @@ Input::Input(std::string filename){
             std::string segment;
             while(std::getline(inputString, segment, ' ')){
                 
-                if(segment != " "){
+                if(segment != ""){
                     imageSize.push_back(stod(segment));
             
                 }
@@ -34,7 +34,7 @@ Input::Input(std::string filename){
             std::string segment;
             while(std::getline(inputString, segment, ' ')){
                 
-                if(segment != " "){
+                if(segment != ""){
                     viewOrigin.push_back(stod(segment));
             
                 }
@@ -48,7 +48,7 @@ Input::Input(std::string filename){
             std::string segment;
             while(std::getline(inputString, segment, ' ')){
                 
-                if(segment != " "){
+                if(segment != ""){
                     viewDir.push_back(stod(segment));
             
                 }
@@ -66,7 +66,7 @@ Input::Input(std::string filename){
             std::string segment;
             while(std::getline(inputString, segment, ' ')){
                 
-                if(segment != " "){
+                if(segment != ""){
                     upDir.push_back(stod(segment));
             
                 }
@@ -80,7 +80,7 @@ Input::Input(std::string filename){
             std::string segment;
             while(std::getline(inputString, segment, ' ')){
                 
-                if(segment != " "){
+                if(segment != ""){
                     backgroundColor.push_back(stod(segment));
             
                 }
@@ -94,7 +94,7 @@ Input::Input(std::string filename){
             std::vector<double> inputNums;
             while(std::getline(inputString, segment, ' ')){
                 
-                if(segment != " "){
+                if(segment != ""){
                     inputNums.push_back(stod(segment));
             
                 }
@@ -109,7 +109,7 @@ Input::Input(std::string filename){
             std::vector<double> inputNums;
             while(std::getline(inputString, segment, ' ')){
                 
-                if(segment != " "){
+                if(segment != ""){
                     inputNums.push_back(stod(segment));
             
                 }
@@ -128,7 +128,7 @@ Input::Input(std::string filename){
             std::vector<double> lightInput;
             while(std::getline(inputString, segment, ' ')){
                 
-                if(segment != " "){
+                if(segment != ""){
                     lightInput.push_back(stod(segment));
             
                 }
@@ -143,7 +143,7 @@ Input::Input(std::string filename){
             std::vector<double> lightInput;
             while(std::getline(inputString, segment, ' ')){
                 
-                if(segment != " "){
+                if(segment != ""){
                     lightInput.push_back(stod(segment));
             
                 }
@@ -177,7 +177,7 @@ Input::Input(std::string filename){
             std::vector<double> inputNums;
             while(std::getline(inputString, segment, ' ')){
                 
-                if(segment != " "){
+                if(segment != ""){
                     inputNums.push_back(stod(segment));
             
                 }
@@ -191,7 +191,7 @@ Input::Input(std::string filename){
             std::vector<double> inputNums;
             while(std::getline(inputString, segment, ' ')){
                 
-                if(segment != " "){
+                if(segment != ""){
                     inputNums.push_back(stod(segment));
             
                 }
@@ -208,7 +208,7 @@ Input::Input(std::string filename){
             std::vector<double> inputNums;
             while(std::getline(inputString, segment, ' ')){
                 
-                if(segment != " "){
+                if(segment != ""){
                     inputNums.push_back(stod(segment));
             
                 }
