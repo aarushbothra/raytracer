@@ -21,7 +21,7 @@ class RayCast{
         Ray crossProduct(Ray a, Ray b);
         double viewWindowWidth;
         double viewWindowHeight;
-        double viewingDistance = 2;
+        const double viewingDistance = 2;
         double vFOV;
         double degreesToRadians(double degrees);
         double radiansToDegrees(double radians);
@@ -41,10 +41,13 @@ class RayCast{
         double distance(Ray a, Ray b);
         std::vector<double> checkFaceIntersection(Ray input, Ray viewOrigin);//returns a distance for each face in the path of ray input. if a face is not in the path, returns -1
         std::vector<double> checkSphereIntersection(Ray input, Ray viewOrigin);
-        std::vector<double> castLightSphere(Sphere sphereAtRay, Ray intersectPos, Material matAtRay, std::vector<LightSource> lights);
-        std::vector<double> castLightFace(Face faceAtRay, Ray intersectPos, Material matAtRay, std::vector<LightSource> lights);
-        std::vector<double> getPixelColor(Ray ray, Ray viewOrigin);//returns color at pixel
+        Ray castLightSphere(Sphere sphereAtRay, Ray intersectPos, Material matAtRay, std::vector<LightSource> lights);
+        Ray castLightFace(Face faceAtRay, Ray intersectPos, Material matAtRay, std::vector<LightSource> lights);
+        Ray getPixelColor(Ray ray, Ray viewOrigin, int recursionDepth);//returns color at pixel
         std::vector<double> matrixSolver(double a, double b, double e, double c, double d, double f);
         std::vector<double> checkPointOnFace(Ray p, Ray e1, Ray e2, Ray p0, double error);
+        Ray specularReflectionRay(Ray surfaceNormal, Ray rayIn);
+        double fresnelCoefficient(Ray surfaceNormal, Ray rayIn, double f0);
+        const int recursionDepthLimit = 10;
 };
 
