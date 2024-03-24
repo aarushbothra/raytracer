@@ -15,6 +15,7 @@ class Intersection{
         bool getIsSphere(){return isSphere;}
         bool getSuccessfulIntersect(){return successfulIntersect;}
         Intersection& operator=(const Intersection& A){return *this;}
+        ~Intersection();
     private: 
         Ray* intersectionPoint;
         Face* intersectFace;

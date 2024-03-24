@@ -86,3 +86,10 @@ double* Face::getTextureCoords(int i){
         throw std::out_of_range ("Index out of bounds");
     }
 }
+
+Face::~Face(){
+    delete vt1;
+    delete vt2;
+    delete vt3;
+    delete texture;
+}

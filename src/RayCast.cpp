@@ -51,7 +51,7 @@ void RayCast::calcViewRays(){
     // std::cout << "calculating rays" << std::endl;
     for(int j=0;j<height;j++){
         for (int i=0;i<width;i++){
-            if (i == width/2 && j == height/2){
+            if (i == 168 && j == 251){
                 int g = 9;
             }
             Ray viewWindowLocation = ul + (deltaV*(j)) + (deltaH*(i));
@@ -72,11 +72,12 @@ Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth){
     if (rayIntersection.getSuccessfulIntersect()){
         Material material = *rayIntersection.getMaterial();
         Ray intersectionPoint = *rayIntersection.getIntersectionPoint();
-        double k0 = 0;
+        double f0 = 0;
+        double ks = material.getMaterial()[8];
         if (material.getMaterial().size()>10){
             double weirdN = material.getMaterial()[11];
-            if (material.getMaterial()[8] != 0){
-                k0 = pow((weirdN-1)/(weirdN + 1), 2);
+            if (ks != 0){
+                f0 = pow((weirdN-1)/(weirdN + 1), 2);
             } 
         } 
         
@@ -86,15 +87,16 @@ Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth){
                 Sphere interesectSphere = *rayIntersection.getIntersectSphere();
                 Ray nVec = (normalizeRay((intersectionPoint-interesectSphere.getLocation())*(1/interesectSphere.getRadius())));
                 
-                if (material.getMaterial().size()>10 && recursionDepth <= recursionDepthLimit && k0 > 0){
-                    pixelColor = castLightSphere(interesectSphere, intersectionPoint, material, visibleLights) + (fresnelCoefficient(nVec, input,k0)*getPixelColor(specularReflectionRay(nVec,input), intersectionPoint, recursionDepth++));
+                if (material.getMaterial().size()>10 && recursionDepth <= recursionDepthLimit && ks > 0){
+                    Ray specRay = specularReflectionRay(nVec,input);
+                    pixelColor = castLightSphere(interesectSphere, intersectionPoint, material, visibleLights) + (fresnelCoefficient(nVec, input,f0)*getPixelColor(specRay, intersectionPoint, recursionDepth++));
                 } else {
                     pixelColor = castLightSphere(interesectSphere, intersectionPoint, material, visibleLights);
                 }
 
             } else {
                 Face intersectFace = *rayIntersection.getIntersectFace();
-                if (material.getMaterial().size()>10 && recursionDepth <= recursionDepthLimit && k0 > 0){
+                if (material.getMaterial().size()>10 && recursionDepth <= recursionDepthLimit && ks > 0){
                     Ray p0 = intersectFace.getVertex(0);
                     Ray p1 = intersectFace.getVertex(1);
                     Ray p2 = intersectFace.getVertex(2);
@@ -102,12 +104,12 @@ Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth){
                     Ray e2 = p2-p0;
                     Ray nVec = normalizeRay(crossProduct(e1,e2));
 
-                    double k0;
+                    double f0;
                     if (material.getMaterial()[8] == 0){
-                        k0 = 0;
+                        f0 = 0;
                     }
 
-                    pixelColor = castLightFace(intersectFace, intersectionPoint, material, visibleLights) + (fresnelCoefficient(nVec, input, k0)*getPixelColor(specularReflectionRay(nVec,input), intersectionPoint, recursionDepth++));
+                    pixelColor = castLightFace(intersectFace, intersectionPoint, material, visibleLights) + (fresnelCoefficient(nVec, input, f0)*getPixelColor(specularReflectionRay(nVec,input), intersectionPoint, recursionDepth++));
                 } else {
                     pixelColor = castLightFace(intersectFace, intersectionPoint, material, visibleLights);
                 }

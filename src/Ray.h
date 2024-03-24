@@ -31,6 +31,7 @@ class Ray{
         friend bool operator==(const Ray &a, const Ray &b){
             return (a.a == b.a && a.b == b.b && a.c == b.c);
         }
+        ~Ray(){}
     private:
         double a,b,c;
     

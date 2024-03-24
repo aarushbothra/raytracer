@@ -27,6 +27,7 @@ class Input{
         std::vector<Material> getMaterials(){return materials;}
         std::vector<Face> getFaces(){return faces;}
         std::vector<Ray> getVertices(){return vertices;}
+        ~Input();
     private:
         std::vector<LightSource> lights;
         std::string filename;

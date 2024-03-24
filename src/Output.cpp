@@ -83,3 +83,7 @@ int Output::max(int maxNum, double input){
     }
     return (int)input;
 }
+
+Output::~Output(){
+    delete[] imageArr;
+}

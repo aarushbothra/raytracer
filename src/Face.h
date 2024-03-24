@@ -14,6 +14,7 @@ class Face {
         Texture* getTexture(){return texture;}
         bool hasNormals(){return bhasNormals;}
         bool hasTexture(){return textured;}
+        ~Face();
     private:
         Ray v1,v2,v3;
         Ray vn1,vn2,vn3;

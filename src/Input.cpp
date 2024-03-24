@@ -310,3 +310,13 @@ void Input::printVector(std::vector<double> input){
     }
     std::cout << std::endl;
 }
+
+Input::~Input(){
+    for (auto texture: textures){
+        delete texture;
+    }
+    for (auto coord: textureCoords){
+        delete coord;
+    }
+    
+}

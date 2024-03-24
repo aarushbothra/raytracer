@@ -39,4 +39,5 @@ class LightSource{
             }
         }
         void print(std::string message);
+        ~LightSource();
 };

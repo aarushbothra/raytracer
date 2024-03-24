@@ -19,3 +19,9 @@ Intersection::Intersection(Ray* point, Material* material, Sphere* sphere){
 Intersection::Intersection(){
     successfulIntersect = false;
 }
+
+Intersection::~Intersection(){
+    delete intersectionPoint;
+    delete intersectMaterial;
+    delete intersectSphere;
+}

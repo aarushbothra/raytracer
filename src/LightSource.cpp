@@ -16,3 +16,5 @@ void LightSource::print(std::string message){
         std::cout << std::endl;
     }
 }
+
+LightSource::~LightSource(){}
