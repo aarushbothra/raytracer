@@ -119,7 +119,7 @@ Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth){
             pixelColor = {material.getMaterial()[0], material.getMaterial()[1], material.getMaterial()[2]};
         }
     }
-    delete &rayIntersection;
+    
     return pixelColor;
 
 }
@@ -151,15 +151,15 @@ Intersection* RayCast::checkIntersections(Ray input, Ray viewOrigin){
         int spheresSize = inputFromUser->getSpheres().size();
         if (leastIndex > (spheresSize)-1){//face
             std::vector<double> outMaterial = materials[materials.size()-1].getMaterial();
-            Material* outputMaterial = &(materials[materials.size()-1]);
-            Face* outputFace = &(inputFromUser->getFaces()[leastIndex - (spheresSize)]);
-            Ray* outputRay = &(intersectPoint);
+            Material* outputMaterial = new Material(outMaterial);
+            Face* outputFace = new Face(inputFromUser->getFaces()[leastIndex - (spheresSize)]);
+            Ray* outputRay = new Ray(intersectPoint);
             return new Intersection( outputRay, outputMaterial,outputFace);
         } else {//sphere
             std::vector<double> outMaterial = materials[leastIndex].getMaterial();
-            Material* outputMaterial = &(materials[leastIndex]);
-            Sphere* outputSphere = &(inputFromUser->getSpheres()[leastIndex]);
-            Ray* outputRay = &(intersectPoint);
+            Material* outputMaterial = new Material(outMaterial);
+            Sphere* outputSphere = new Sphere(inputFromUser->getSpheres()[leastIndex]);
+            Ray* outputRay = new Ray(intersectPoint);
             return new Intersection( outputRay, outputMaterial, outputSphere);
         }
     }
@@ -469,9 +469,4 @@ std::vector<double> RayCast::matrixSolver(double a, double b, double e, double c
         return {-1, -1}; 
     }
 
-}
-
-RayCast::~RayCast(){
-    // delete inputFromUser;
-    // delete userImage;
 }

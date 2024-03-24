@@ -21,7 +21,7 @@ Intersection::Intersection(){
 }
 
 Intersection::~Intersection(){
-    // delete intersectionPoint;
-    // delete intersectMaterial;
-    // delete intersectSphere;
+    delete intersectionPoint;
+    delete intersectMaterial;
+    delete intersectSphere;
 }

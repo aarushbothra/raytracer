@@ -12,7 +12,6 @@ class Texture{
         int getWidth(){return width;}
         int getHeight(){return height;}
         std::string getFilename(){return filename;}
-        ~Texture();
     private:
         std::string filename;
         double** imageArr;
