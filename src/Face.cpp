@@ -88,8 +88,8 @@ double* Face::getTextureCoords(int i){
 }
 
 Face::~Face(){
-    delete vt1;
-    delete vt2;
-    delete vt3;
-    delete texture;
+    // delete vt1;
+    // delete vt2;
+    // delete vt3;
+    // delete texture;
 }

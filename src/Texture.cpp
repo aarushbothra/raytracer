@@ -81,6 +81,10 @@ void Texture::ingestTexture(){
         }
         
     }
-
+    delete[] loopSegArr;
     file.close();
+}
+
+Texture::~Texture(){
+    delete[] imageArr;
 }
