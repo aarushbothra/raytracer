@@ -13,7 +13,7 @@ class Output{
         void modPixel(double red, double green, double blue, int posX, int posY);//modifies a single pixel
         std::vector<double> getPixel(int posX, int posY);
         void generateImage();//generates a ppm image by writing the contents of imageArr to a file of the same name as filename
-        ~Output();
+        // ~Output();
     private:
         std::string filename;
         std::string stripExtension(std::string currFilename);//strips the file extension so a .ppm extension can be added

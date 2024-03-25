@@ -28,6 +28,9 @@ int main(int argc, char *argv[]){
 
     image.generateImage();
     std::cout << "done\n";
+    userInput.~Input();
+    // image.~Output();
+    rayCaster.~RayCast();
     return 0;
 }
 

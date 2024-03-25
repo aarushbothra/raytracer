@@ -21,7 +21,13 @@ Intersection::Intersection(){
 }
 
 Intersection::~Intersection(){
-    delete intersectionPoint;
-    delete intersectMaterial;
-    delete intersectSphere;
+    if (successfulIntersect){
+        delete intersectionPoint;
+        delete intersectMaterial;
+        if (isSphere){
+            delete intersectSphere;
+        } else {
+            delete intersectFace;
+        }
+    }
 }

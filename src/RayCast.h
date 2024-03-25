@@ -10,7 +10,7 @@
 class RayCast{
     public:
         RayCast(Input userInput, Output image);
-        ~RayCast();
+        ~RayCast(){};
     private:
         Input* inputFromUser;
         Ray w;//-viewDir normalized

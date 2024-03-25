@@ -11,6 +11,7 @@ class Sphere{
         double getRadius();
         bool hasTexture(){return textured;}
         Texture* getTexture(){return texture;}
+        ~Sphere(){}
     private:
         Ray location;
         double radius;

@@ -10,7 +10,8 @@ Input::Input(std::string filename){
     int inputCounter = 0;
     vertices.push_back(Ray());
     vertexNormals.push_back(Ray());
-    textureCoords.push_back(new double);
+    std::vector<double> blank = {};
+    textureCoords.push_back(blank);
     int sphereCount = 0;
     while (!inputFile.eof() && inputFile.is_open()){
         inputFile >> input;
@@ -170,6 +171,7 @@ Input::Input(std::string filename){
             } else {
                 inputFile >> input;
             }
+            delete[] string;
         } else if (input == "v"){
             std::getline(inputFile, input);
             std::stringstream inputString(input.substr(1));
@@ -213,10 +215,7 @@ Input::Input(std::string filename){
             
                 }
             }
-            double* vt = new double[2];
-            vt[0] = inputNums[0];
-            vt[1] = inputNums[1];
-            textureCoords.push_back(vt);
+            textureCoords.push_back(inputNums);
         }
         
         
@@ -315,8 +314,6 @@ Input::~Input(){
     for (auto texture: textures){
         delete texture;
     }
-    for (auto coord: textureCoords){
-        delete coord;
-    }
     
+
 }

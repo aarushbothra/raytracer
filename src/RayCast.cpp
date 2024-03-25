@@ -119,7 +119,7 @@ Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth){
             pixelColor = {material.getMaterial()[0], material.getMaterial()[1], material.getMaterial()[2]};
         }
     }
-    
+    // delete &rayIntersection;
     return pixelColor;
 
 }
@@ -330,7 +330,7 @@ Ray RayCast::castLightFace(Face faceAtRay, Ray intersectPos, Material matAtRay, 
             nVec = normalizeRay(faceAtRay.getNormal(0)*baryCoords[2] + faceAtRay.getNormal(1)*baryCoords[0] + faceAtRay.getNormal(2)*baryCoords[1]);
         }
         if (faceAtRay.hasTexture()){
-            std::vector<double*> textureCoords = {faceAtRay.getTextureCoords(0), faceAtRay.getTextureCoords(1), faceAtRay.getTextureCoords(2)};
+            std::vector<std::vector<double>> textureCoords = {faceAtRay.getTextureCoords(0), faceAtRay.getTextureCoords(1), faceAtRay.getTextureCoords(2)};
             double u = baryCoords[2]*textureCoords[0][0] + baryCoords[0]*textureCoords[1][0] + baryCoords[1]*textureCoords[2][0];
             double v = baryCoords[2]*textureCoords[0][1] + baryCoords[0]*textureCoords[1][1] + baryCoords[1]*textureCoords[2][1];
             matAtRay.calcTextureCoefficients(Ray(faceAtRay.getTexture()->getPixel(u,v))*(1.0/255.0));

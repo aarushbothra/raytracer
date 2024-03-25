@@ -85,5 +85,10 @@ int Output::max(int maxNum, double input){
 }
 
 Output::~Output(){
+    for (int i=0;i<height;i++){
+        for (int j=0;j<width;j++){
+            delete[] imageArr[i*width+j];
+        }
+    }
     delete[] imageArr;
 }

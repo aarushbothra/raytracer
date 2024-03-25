@@ -46,6 +46,6 @@ class Input{
         std::vector<Face> faces;
         std::vector<Material> materials;
         std::vector<Texture*> textures;
-        std::vector<double*> textureCoords;
+        std::vector<std::vector<double>> textureCoords;
 
 };
