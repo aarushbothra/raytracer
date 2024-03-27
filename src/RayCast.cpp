@@ -58,13 +58,14 @@ void RayCast::calcViewRays(){
             Ray viewOrigin = inputFromUser->getViewOrigin();
             Ray rayDir = normalizeRay(viewWindowLocation - viewOrigin);
             double bgWeirdN = inputFromUser->getBackgroundColor()[3];
-            Ray pixelColor = getPixelColor(rayDir, viewOrigin, 0, bgWeirdN);
+            Ray pixelColor = getPixelColor(rayDir, viewOrigin, 0, {bgWeirdN});
             userImage->modPixel(pixelColor[0],pixelColor[1],pixelColor[2],i,j);
+
         }
     }
 }
 
-Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth, double currentWeirdN){
+Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth, std::vector<double> weirdNStack){
     Ray pixelColor = inputFromUser->getBackgroundColor();
 
     Intersection rayIntersection = *checkIntersections(input, viewOrigin);
@@ -72,44 +73,49 @@ Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth, double
         Material material = *rayIntersection.getMaterial();
         Ray intersectionPoint = *rayIntersection.getIntersectionPoint();
         double k0 = 0;
-        double ks = material.getMaterial()[8]; 
-        double weirdN;
-        bool exitingMaterial = false;
-        if (material.getMaterial().size()>10){
-            weirdN = material.getMaterial()[11];
-            if (weirdN == currentWeirdN){
-                weirdN = inputFromUser->getBackgroundColor()[3];
-                exitingMaterial = true;
-            }
-            if (ks != 0){
-                k0 = pow((weirdN-1)/(weirdN + 1), 2);
-            } 
-                
-        } 
+        double ks = material.getMaterial()[8];         
         if(material.getMaterial().size()>3){
             std::vector<LightSource> visibleLights = shadeRay(intersectionPoint);
             if (rayIntersection.getIsSphere()){
-                double k0 = 0;
-                double alpha;
                 double ks = material.getMaterial()[8]; 
-                Ray tVec;
                 Sphere interesectSphere = *rayIntersection.getIntersectSphere();
-                Ray nVec = (normalizeRay((intersectionPoint-interesectSphere.getLocation())*(1/interesectSphere.getRadius())));
-                if (material.getMaterial().size()>10){
-                    alpha = material.getMaterial()[10];
-                    if (exitingMaterial){
-                        nVec = nVec*-1;
-                    } 
-                    tVec = gettVec(nVec, input, currentWeirdN, weirdN);
-                } 
                 
                 if (material.getMaterial().size()>10 && recursionDepth <= recursionDepthLimit && ks > 0){
                     recursionDepth = recursionDepth + 1;
+                    
+                    Ray nVec = (normalizeRay((intersectionPoint-interesectSphere.getLocation())*(1/interesectSphere.getRadius())));
+                    double alpha = material.getMaterial()[10];
+                    bool exitingMaterial = false;
+                    double inputAngle = acos(dotProduct(nVec, input));
+                    if (radiansToDegrees(inputAngle)>(90-1e-10)){
+                        nVec = nVec*-1;
+                        exitingMaterial = true;
+                        std::cout<< "is exiting\n";
+                    } else {
+                        weirdNStack.push_back(material.getMaterial()[11]);
+                        // std::cout<<"is entering\n";
+                    }
+
+                    Ray specRay = specularReflectionRay(nVec,input*-1);
+                    double k0 = pow((weirdNStack.back()-1)/(weirdNStack.back() + 1), 2);
                     double reflectanceFr = fresnelCoefficient(nVec, input*-1, k0);
-                    double refractionFr = fresnelCoefficient(nVec, input*-1, pow((weirdN-currentWeirdN)/(weirdN+currentWeirdN),2));
-                    Ray specularReflection = (reflectanceFr*getPixelColor(specularReflectionRay(nVec,input*-1), intersectionPoint, recursionDepth, weirdN));
-                    Ray refraction = ((1-refractionFr)*(1-alpha)*getPixelColor(tVec, intersectionPoint, 0, currentWeirdN));
-                    pixelColor = castLightSphere(interesectSphere, intersectionPoint, material, visibleLights) + specularReflection + refraction;
+                    if (sin(inputAngle) > (weirdNStack.at(weirdNStack.size()-2)/weirdNStack.back())){
+                        std::cout << "total internal reflection\n";
+                        Ray specularReflection = (reflectanceFr*getPixelColor(specRay, intersectionPoint, recursionDepth, weirdNStack));
+                        pixelColor = castLightSphere(interesectSphere, intersectionPoint, material, visibleLights) + specularReflection;
+
+                    } else {
+                        double refractionFr = fresnelCoefficient(nVec, input*-1, pow((weirdNStack.back()-weirdNStack.at(weirdNStack.size()-2))/(weirdNStack.back()+weirdNStack.at(weirdNStack.size()-2)),2));
+                        Ray tVec = gettVec(nVec, input*-1, weirdNStack.at(weirdNStack.size()-2), weirdNStack.back());
+                        Ray refraction = ((1-refractionFr)*(1-alpha)*getPixelColor(tVec, intersectionPoint, 0, weirdNStack));
+                        Ray specularReflection = (reflectanceFr*getPixelColor(specRay, intersectionPoint, recursionDepth, weirdNStack));
+                        pixelColor = castLightSphere(interesectSphere, intersectionPoint, material, visibleLights) + specularReflection + refraction;
+
+                    }
+                     
+                    if (exitingMaterial){
+                        weirdNStack.pop_back();
+                    }
                 } else {
                     pixelColor = castLightSphere(interesectSphere, intersectionPoint, material, visibleLights);
                 }
@@ -117,6 +123,7 @@ Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth, double
             } else {
                 Face intersectFace = *rayIntersection.getIntersectFace();
                 if (material.getMaterial().size()>10 && recursionDepth <= recursionDepthLimit && ks > 0){
+                    k0 = pow((weirdNStack.back()-1)/(weirdNStack.back() + 1), 2);
                     Ray p0 = intersectFace.getVertex(0);
                     Ray p1 = intersectFace.getVertex(1);
                     Ray p2 = intersectFace.getVertex(2);
@@ -129,7 +136,7 @@ Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth, double
                         k0 = 0;
                     }
                     recursionDepth = recursionDepth + 1;
-                    pixelColor = castLightFace(intersectFace, intersectionPoint, material, visibleLights) + (fCoeff*getPixelColor(specularReflectionRay(nVec,input*-1), intersectionPoint, recursionDepth, weirdN));
+                    pixelColor = castLightFace(intersectFace, intersectionPoint, material, visibleLights) + (fCoeff*getPixelColor(specularReflectionRay(nVec,input*-1), intersectionPoint, recursionDepth, weirdNStack));
                 } else {
                     pixelColor = castLightFace(intersectFace, intersectionPoint, material, visibleLights);
                 }
@@ -143,6 +150,8 @@ Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth, double
     return pixelColor;
 
 }
+
+
 
 Ray RayCast::gettVec(Ray nVec, Ray input, double currWeridN, double newWeirdN){
     double nRatio = currWeridN/newWeirdN;
@@ -271,10 +280,10 @@ std::vector<double> RayCast::checkSphereIntersection(Ray input, Ray viewOrigin){
     for (int i=0;i<spheres.size();i++){
 
         //check if viewOrigin is on current sphere. if so, skip calculations
-        if (fabs((pow((viewOrigin[0]-spheres[i].getLocation()[0]),2) + pow((viewOrigin[1]-spheres[i].getLocation()[1]),2) + pow((viewOrigin[2]-spheres[i].getLocation()[2]),2)) - pow(spheres[i].getRadius(),2)) < error){
-            distance.push_back(-1);
-            continue;
-        }
+        // if (fabs((pow((viewOrigin[0]-spheres[i].getLocation()[0]),2) + pow((viewOrigin[1]-spheres[i].getLocation()[1]),2) + pow((viewOrigin[2]-spheres[i].getLocation()[2]),2)) - pow(spheres[i].getRadius(),2)) < error){
+        //     distance.push_back(-1);
+        //     continue;
+        // }
 
         Ray aTemp = input;
         aTemp.square();
