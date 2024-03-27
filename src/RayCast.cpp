@@ -57,15 +57,14 @@ void RayCast::calcViewRays(){
             Ray viewWindowLocation = ul + (deltaV*(j)) + (deltaH*(i));
             Ray viewOrigin = inputFromUser->getViewOrigin();
             Ray rayDir = normalizeRay(viewWindowLocation - viewOrigin);
-            Ray pixelColor = getPixelColor(rayDir, viewOrigin, 0);
+            double bgWeirdN = inputFromUser->getBackgroundColor()[3];
+            Ray pixelColor = getPixelColor(rayDir, viewOrigin, 0, bgWeirdN);
             userImage->modPixel(pixelColor[0],pixelColor[1],pixelColor[2],i,j);
-
         }
     }
-    
 }
 
-Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth){
+Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth, double currentWeirdN){
     Ray pixelColor = inputFromUser->getBackgroundColor();
 
     Intersection rayIntersection = *checkIntersections(input, viewOrigin);
@@ -74,23 +73,43 @@ Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth){
         Ray intersectionPoint = *rayIntersection.getIntersectionPoint();
         double k0 = 0;
         double ks = material.getMaterial()[8]; 
+        double weirdN;
+        bool exitingMaterial = false;
         if (material.getMaterial().size()>10){
-            double weirdN = material.getMaterial()[11];
+            weirdN = material.getMaterial()[11];
+            if (weirdN == currentWeirdN){
+                weirdN = inputFromUser->getBackgroundColor()[3];
+                exitingMaterial = true;
+            }
             if (ks != 0){
                 k0 = pow((weirdN-1)/(weirdN + 1), 2);
             } 
+                
         } 
-        
         if(material.getMaterial().size()>3){
             std::vector<LightSource> visibleLights = shadeRay(intersectionPoint);
             if (rayIntersection.getIsSphere()){
+                double k0 = 0;
+                double alpha;
+                double ks = material.getMaterial()[8]; 
+                Ray tVec;
                 Sphere interesectSphere = *rayIntersection.getIntersectSphere();
                 Ray nVec = (normalizeRay((intersectionPoint-interesectSphere.getLocation())*(1/interesectSphere.getRadius())));
+                if (material.getMaterial().size()>10){
+                    alpha = material.getMaterial()[10];
+                    if (exitingMaterial){
+                        nVec = nVec*-1;
+                    } 
+                    tVec = gettVec(nVec, input, currentWeirdN, weirdN);
+                } 
                 
                 if (material.getMaterial().size()>10 && recursionDepth <= recursionDepthLimit && ks > 0){
                     recursionDepth = recursionDepth + 1;
-                    double fCoeff = fresnelCoefficient(nVec, input*-1, k0);
-                    pixelColor = castLightSphere(interesectSphere, intersectionPoint, material, visibleLights) + (fCoeff*getPixelColor(specularReflectionRay(nVec,input*-1), intersectionPoint, recursionDepth));
+                    double reflectanceFr = fresnelCoefficient(nVec, input*-1, k0);
+                    double refractionFr = fresnelCoefficient(nVec, input*-1, pow((weirdN-currentWeirdN)/(weirdN+currentWeirdN),2));
+                    Ray specularReflection = (reflectanceFr*getPixelColor(specularReflectionRay(nVec,input*-1), intersectionPoint, recursionDepth, weirdN));
+                    Ray refraction = ((1-refractionFr)*(1-alpha)*getPixelColor(tVec, intersectionPoint, 0, currentWeirdN));
+                    pixelColor = castLightSphere(interesectSphere, intersectionPoint, material, visibleLights) + specularReflection + refraction;
                 } else {
                     pixelColor = castLightSphere(interesectSphere, intersectionPoint, material, visibleLights);
                 }
@@ -104,13 +123,13 @@ Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth){
                     Ray e1 = p1-p0;
                     Ray e2 = p2-p0;
                     Ray nVec = normalizeRay(crossProduct(e1,e2));
-
+                    double fCoeff = fresnelCoefficient(nVec, input*-1, k0);
                     double k0;
                     if (material.getMaterial()[8] == 0){
                         k0 = 0;
                     }
                     recursionDepth = recursionDepth + 1;
-                    pixelColor = castLightFace(intersectFace, intersectionPoint, material, visibleLights) + (fresnelCoefficient(nVec, input, k0)*getPixelColor(specularReflectionRay(nVec,input), intersectionPoint, recursionDepth));
+                    pixelColor = castLightFace(intersectFace, intersectionPoint, material, visibleLights) + (fCoeff*getPixelColor(specularReflectionRay(nVec,input*-1), intersectionPoint, recursionDepth, weirdN));
                 } else {
                     pixelColor = castLightFace(intersectFace, intersectionPoint, material, visibleLights);
                 }
@@ -123,6 +142,12 @@ Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth){
     
     return pixelColor;
 
+}
+
+Ray RayCast::gettVec(Ray nVec, Ray input, double currWeridN, double newWeirdN){
+    double nRatio = currWeridN/newWeirdN;
+    double nDotI = dotProduct(nVec, input);
+    return normalizeRay((nVec*-1)*sqrt(1-(nRatio*nRatio)*(1-(nDotI*nDotI)))+nRatio*((nDotI*nVec - input)));
 }
 
 Intersection* RayCast::checkIntersections(Ray input, Ray viewOrigin){

@@ -43,11 +43,12 @@ class RayCast{
         std::vector<double> checkSphereIntersection(Ray input, Ray viewOrigin);
         Ray castLightSphere(Sphere sphereAtRay, Ray intersectPos, Material matAtRay, std::vector<LightSource> lights);
         Ray castLightFace(Face faceAtRay, Ray intersectPos, Material matAtRay, std::vector<LightSource> lights);
-        Ray getPixelColor(Ray ray, Ray viewOrigin, int recursionDepth);//returns color at pixel
+        Ray getPixelColor(Ray ray, Ray viewOrigin, int recursionDepth, double currentWeirdN);//returns color at pixel
         std::vector<double> matrixSolver(double a, double b, double e, double c, double d, double f);
         std::vector<double> checkPointOnFace(Ray p, Ray e1, Ray e2, Ray p0, double error);
         Ray specularReflectionRay(Ray surfaceNormal, Ray rayIn);
         double fresnelCoefficient(Ray surfaceNormal, Ray rayIn, double f0);
         const int recursionDepthLimit = 10;
+        Ray gettVec(Ray nVec, Ray input, double currAlpha, double newAlpha);
 };
 
