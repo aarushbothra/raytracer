@@ -86,11 +86,11 @@ Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth, std::v
                     Ray nVec = (normalizeRay((intersectionPoint-interesectSphere.getLocation())*(1/interesectSphere.getRadius())));
                     double alpha = material.getMaterial()[10];
                     bool exitingMaterial = false;
-                    double inputAngle = acos(dotProduct(nVec, input));
-                    if (radiansToDegrees(inputAngle)>(90-1e-10)){
+                    double inputAngle = acos(dotProduct(nVec, input*-1));
+                    if (radiansToDegrees(inputAngle) > (90)){
                         nVec = nVec*-1;
                         exitingMaterial = true;
-                        std::cout<< "is exiting\n";
+                        // std::cout<< "is exiting\n";
                     } else {
                         weirdNStack.push_back(material.getMaterial()[11]);
                         // std::cout<<"is entering\n";
@@ -99,7 +99,7 @@ Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth, std::v
                     Ray specRay = specularReflectionRay(nVec,input*-1);
                     double k0 = pow((weirdNStack.back()-1)/(weirdNStack.back() + 1), 2);
                     double reflectanceFr = fresnelCoefficient(nVec, input*-1, k0);
-                    if (sin(inputAngle) > (weirdNStack.at(weirdNStack.size()-2)/weirdNStack.back())){
+                    if (sin(inputAngle) > (weirdNStack.at(weirdNStack.size()-2)/weirdNStack.back()) && exitingMaterial){
                         std::cout << "total internal reflection\n";
                         Ray specularReflection = (reflectanceFr*getPixelColor(specRay, intersectionPoint, recursionDepth, weirdNStack));
                         pixelColor = castLightSphere(interesectSphere, intersectionPoint, material, visibleLights) + specularReflection;
@@ -107,15 +107,17 @@ Ray RayCast::getPixelColor(Ray input, Ray viewOrigin, int recursionDepth, std::v
                     } else {
                         double refractionFr = fresnelCoefficient(nVec, input*-1, pow((weirdNStack.back()-weirdNStack.at(weirdNStack.size()-2))/(weirdNStack.back()+weirdNStack.at(weirdNStack.size()-2)),2));
                         Ray tVec = gettVec(nVec, input*-1, weirdNStack.at(weirdNStack.size()-2), weirdNStack.back());
-                        Ray refraction = ((1-refractionFr)*(1-alpha)*getPixelColor(tVec, intersectionPoint, 0, weirdNStack));
+                        
                         Ray specularReflection = (reflectanceFr*getPixelColor(specRay, intersectionPoint, recursionDepth, weirdNStack));
+                        if (exitingMaterial){
+                            weirdNStack.pop_back();
+                        }
+                        Ray refraction = ((1-refractionFr)*(1-alpha)*getPixelColor(tVec, intersectionPoint, 0, weirdNStack));
                         pixelColor = castLightSphere(interesectSphere, intersectionPoint, material, visibleLights) + specularReflection + refraction;
 
                     }
                      
-                    if (exitingMaterial){
-                        weirdNStack.pop_back();
-                    }
+                    
                 } else {
                     pixelColor = castLightSphere(interesectSphere, intersectionPoint, material, visibleLights);
                 }
