@@ -1,6 +1,6 @@
 CXX=g++
 CXXFLAGS= -std=c++11 -g
-OUTFILE=raytracer1c
+OUTFILE=raytracer1d
 .DEFAULT_GOAL := all
 all: $(OUTFILE)
 
