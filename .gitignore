@@ -1,7 +1,7 @@
 *.pdf
-*.ppm
-*.txt
 *.o
+*samples/*.ppm
+showcases/*.ppm
 raytracer*
 .vscode/*
 *.png
