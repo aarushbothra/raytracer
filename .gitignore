@@ -1,10 +1,11 @@
 *.pdf
 *.o
 *samples/*.ppm
-showcases/*.ppm
+showcases/*/*.ppm
 raytracer*
 .vscode/*
 *.png
 writeups
 *.zip
 .DS_Store
+build/*

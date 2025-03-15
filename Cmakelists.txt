@@ -1,0 +1,32 @@
+# cmake_minimum_required(3.24)
+project(raytracer)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "-g")
+
+add_executable(${PROJECT_NAME}
+src/Face.cpp
+src/Face.h
+src/Input.cpp
+src/Input.h
+src/Intersection.cpp
+src/Intersection.h
+src/LightSource.cpp
+src/LightSource.h
+src/main.cpp
+src/Material.cpp
+src/Material.h
+src/Output.cpp
+src/Output.h
+src/Ray.cpp
+src/Ray.h
+src/RayCast.cpp
+src/RayCast.h
+src/Sphere.cpp
+src/Sphere.h
+src/Texture.cpp
+src/Texture.h
+)
+
+
+

@@ -1,6 +1,16 @@
-# Assignment 1D
-## Compilation
-Use `make clean` to clean the directory of previously compiled materials. Then, use `make` to compile .o files and raytracer1d.
+# Raytracer
+## Usage
+To build, do the following:
+```
+mkdir build
+cd build
+cmake ..
+make -j
+cd ..
+```
+Then, to run, do this:
+```
+./build/raytracer showcases/basic/showcase.txt
+```
 
-## Pictures for Showcase
-Images that should be included in the showcase presentation are `showcase.png`
+`raytracer` will output a .ppm file in the directory of showcase.txt.
